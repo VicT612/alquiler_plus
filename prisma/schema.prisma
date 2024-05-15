@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model usuario {
+  id                       Int            @id @default(autoincrement())
+  nombre                   String
+  apellido                 String
+  telefono                 String         @unique
+  direccion                String
+  email                    String         @unique
+  contrasena               String
+  ciudad                   String
+  fotoUrl                  String
+  fechaNacimiento          String?
+  fechaDeRegistro          DateTime       @default(now())
+  ci                       String         @unique
+  rol                      UserRole       @default(USUARIO)
+  tutorialCompletado       Boolean        @default(false)
+  calificacionesRecibidas  calificacion[] @relation("CalificacionesRecibidas")
+  calificacionesRealizadas calificacion[] @relation("CalificacionesRealizadas")
+  comentarios              comentario[]
+  cuartos                  cuarto[]       @relation("UsuarioCuartos")
+  deudas                   deuda[]
+  mensajesEnviados         mensaje[]      @relation("MensajesEnviados")
+  mensajesRecibidos        mensaje[]      @relation("MensajesRecibidos")
+  pagos                    pagos[]
+  reportes                 reportes[]
+}
+
+model cuarto {
+  id                Int          @id @default(autoincrement())
+  direccion         String
+  ubicacionId       Int
+  descripcion       String
+  condiciones       String
+  precio            Int
+  nombrePropietario String
+  tipoCuarto        TipoCuarto
+  estadoCuarto      EstadoCuarto
+  usuarioId         Int
+  comentarios       comentario[] @relation("CuartoComentarios")
+  ubicacion         ubicacion    @relation("CuartoUbicacion", fields: [ubicacionId], references: [id])
+  usuario           usuario      @relation("UsuarioCuartos", fields: [usuarioId], references: [id])
+  ofertas           oferta[]
+  pagos             pagos[]      @relation("PagosCuarto")
+}
+
+model comentario {
+  id            Int      @id @default(autoincrement())
+  fechaRegistro DateTime @default(now())
+  contenido     String
+  estrellas     Int
+  cuartoId      Int
+  usuarioId     Int
+  cuarto        cuarto   @relation("CuartoComentarios", fields: [cuartoId], references: [id])
+  usuario       usuario  @relation(fields: [usuarioId], references: [id])
+}
+
+model ubicacion {
+  id         Int      @id @default(autoincrement())
+  latitud    Float
+  longitud   Float
+  beneficios String
+  cuartos    cuarto[] @relation("CuartoUbicacion")
+}
+
+model mensaje {
+  id         Int      @id @default(autoincrement())
+  contenido  String
+  fechaEnvio DateTime @default(now())
+  emisorId   Int
+  receptorId Int
+  archivos   String?
+  emisor     usuario  @relation("MensajesEnviados", fields: [emisorId], references: [id])
+  receptor   usuario  @relation("MensajesRecibidos", fields: [receptorId], references: [id])
+}
+
+model pagos {
+  id          Int     @id @default(autoincrement())
+  usuarioId   Int
+  cuartoId    Int
+  descripcion String
+  metodoPago  String
+  cuarto      cuarto  @relation("PagosCuarto", fields: [cuartoId], references: [id])
+  usuario     usuario @relation(fields: [usuarioId], references: [id])
+}
+
+model reportes {
+  id            Int      @id @default(autoincrement())
+  usuarioId     Int
+  fechaGenerada DateTime @default(now())
+  descripcion   String
+  usuario       usuario  @relation(fields: [usuarioId], references: [id])
+}
+
+model deuda {
+  id               Int      @id @default(autoincrement())
+  usuarioId        Int
+  monto            Float
+  fechaVencimiento DateTime
+  descripcion      String
+  usuario          usuario  @relation(fields: [usuarioId], references: [id])
+}
+
+model calificacion {
+  id            Int     @id @default(autoincrement())
+  calificadorId Int
+  calificadoId  Int
+  estrellas     Int
+  comentario    String
+  calificado    usuario @relation("CalificacionesRecibidas", fields: [calificadoId], references: [id])
+  calificador   usuario @relation("CalificacionesRealizadas", fields: [calificadorId], references: [id])
+}
+
+model oferta {
+  id          Int      @id @default(autoincrement())
+  cuartoId    Int
+  descripcion String
+  fechaInicio DateTime
+  fechaFin    DateTime
+  descuento   Float
+  cuarto      cuarto   @relation(fields: [cuartoId], references: [id])
+}
+
+enum UserRole {
+  ADMIN
+  PROPIETARIO
+  USUARIO
+  ANONIMO
+  BANEADO
+}
+
+enum TipoCuarto {
+  GARZONIER
+  ESTUDIO
+  APARTAMENTO
+}
+
+enum EstadoCuarto {
+  DESOCUPADO
+  EN_CONTRATO
+  ALQUILADO
+}

@@ -1,113 +1,246 @@
-import Image from "next/image";
+'use client'
+import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from 'react';
+import { useSession, signIn } from 'next-auth/react';
+import axios from 'axios';
+import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import Entrada from './componentes/Entradas';
+import Boton from './componentes/Boton';
+import GoogleButton from './componentes/GoogleBoton';
+import { toast } from 'react-hot-toast';
 
-export default function Home() {
+type Variant = 'LOGIN' | 'REGISTER';
+
+const AuthForm = () => {
+  const session = useSession();
+  const [variant, setVariant] = useState<Variant>('LOGIN');
+  const [isLoading, setIsLoading] = useState(false);
+  const [fotoUrl, setFotoUrl] = useState<string>('');
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false);
+  const router = useRouter();
+
+  const handleSignIn = async (provider: 'google' | 'azure-ad') => {
+    setIsLoading(true);
+    signIn(provider);
+  };
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<FieldValues>({
+    defaultValues: {
+      nombre: '',
+      email: '',
+      contrasena: '',
+      telefono: '',
+      direccion: '',
+      ciudad: '',
+      fechaNacimiento: '',
+      ci: '',
+    },
+  });
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0 && variant === 'REGISTER') {
+      const file = files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFotoUrl(reader.result as string);
+        setShowPhotoUpload(false); // Ocultar el botón de subir foto después de cargarla con éxito
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const onSubmit: SubmitHandler<FieldValues> = async (data, event) => {
+    try {
+      if (event) {
+        event.preventDefault();
+      }
+      setIsLoading(true);
+  
+      let response;
+      if (variant === 'LOGIN') {
+        response = await axios.post('/api/inicio', { email: data.email, contrasena: data.contrasena });
+      } else {
+        response = await axios.post('/api/agregar', { ...data, fotoUrl });
+      }
+  
+      if (variant === 'LOGIN') {
+        const rol = response.data.rol;
+        switch (rol) {
+          case 'USUARIO':
+            router.push('/InicioUsuario');
+            break;
+          case 'PROPIETARIO':
+            router.push('/InicioPropietario');
+            break;
+          case 'ADMIN':
+            router.push('/InicioAdmin');
+            break;
+          case 'BANEADO':
+            router.push('/InicioBaneado');
+            break;
+          default:
+            router.push('/');
+            break;
+        }
+      } else {
+        toast.success('Usuario registrado exitosamente');
+        router.push('/');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Something went wrong!');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+
+  useEffect(() => {
+    if (session?.status === 'authenticated') {
+      router.push('/');
+    }
+  }, [session, router]);
+
+  useEffect(() => {
+    if (session?.data?.user) {
+      setValue('nombre', session.data.user.name);
+      setValue('email', session.data.user.email);
+      if (session.data.user.image) {
+        setFotoUrl(session.data.user.image);
+      } else {
+        setShowPhotoUpload(true);
+      }
+    } else {
+      setShowPhotoUpload(true);
+    }
+  }, [session, setValue]);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/(site)/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+    <div className="flex justify-center items-center h-screen">
+      <div className="max-w-md w-full p-6 bg-white border border-black rounded-md shadow-md">
+        <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-8">
+          {variant === 'LOGIN' ? 'Inicia Sesión' : 'Regístrate'}
+        </h2>
+        {variant === 'REGISTER' && fotoUrl && (
+          <img src={fotoUrl} alt="Foto de perfil" className="mx-auto rounded-full w-24 h-24 mb-4" />
+        )}
+        {variant === 'REGISTER' && showPhotoUpload && (
+          <div className="flex justify-center mb-4">
+            <label htmlFor="upload-photo" className="cursor-pointer">
+              <img src='./'></img>
+              <input id="upload-photo" type="file" className="hidden" onChange={handleFileChange} />
+            </label>
+          </div>
+        )}
+        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          {variant === 'REGISTER' && (
+            <>
+              <Entrada
+                disabled={false}
+                register={register}
+                errors={errors}
+                required
+                id="nombre"
+                label="Nombre"
+              />
+              <Entrada
+                disabled={false}
+                register={register}
+                errors={errors}
+                required
+                id="telefono"
+                label="Teléfono"
+              />
+              <Entrada
+                disabled={false}
+                register={register}
+                errors={errors}
+                required
+                id="direccion"
+                label="Dirección"
+              />
+              <Entrada
+                disabled={false}
+                register={register}
+                errors={errors}
+                required
+                id="ciudad"
+                label="Ciudad"
+              />
+              <Entrada
+                disabled={false}
+                register={register}
+                errors={errors}
+                required
+                id="fechaNacimiento"
+                label="Fecha de Nacimiento"
+                type="date"
+              />
+              <Entrada
+                disabled={false}
+                register={register}
+                errors={errors}
+                required
+                id="ci"
+                label="Carnet de Identidad"
+              />
+            </>
+          )}
+          <Entrada
+            disabled={false}
+            register={register}
+            errors={errors}
+            required
+            id="email"
+            label="Correo Electrónico"
+            type="email"
+          />
+          <Entrada
+            disabled={false}
+            register={register}
+            errors={errors}
+            required
+            id="contrasena"
+            label="Contraseña"
+            type="password"
+          />
+          <Boton fullWidth type="submit">
+            {variant === 'LOGIN' ? 'Iniciar Sesión' : 'Registrarse'}
+          </Boton>
+          <div className="flex justify-center">
+            <div onClick={() => setVariant(variant === 'LOGIN' ? 'REGISTER' : 'LOGIN')} className="cursor-pointer text-sm text-blue-500 hover:text-blue-700">
+              {variant === 'LOGIN' ? '¿No tienes una cuenta? Regístrate' : '¿Ya tienes una cuenta? Iniciar Sesión'}
+            </div>
+          </div>
+        </form>
+        {variant === 'LOGIN' && (
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-white px-2 text-gray-500">Iniciar Sesión con</span>
+              </div>
+            </div>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <div>
+                <GoogleButton onClick={() => handleSignIn('google')} />
+              </div>
+              <div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   );
-}
+};
+
+export default AuthForm;

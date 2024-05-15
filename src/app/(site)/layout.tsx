@@ -1,13 +1,16 @@
+import { SessionProvider } from "next-auth/react"
+
 export default function DashboardLayout({
   children, // will be a page or nested layout
 }: {
   children: React.ReactNode
 }) {
   return (
-    <section>
-      <nav></nav>
- 
-      {children}
-    </section>
+    
+      <section>
+        <nav></nav>
+        {children}
+      </section>
+    
   )
 }
