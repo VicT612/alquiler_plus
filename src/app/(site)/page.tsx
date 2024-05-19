@@ -7,9 +7,13 @@ import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import Entrada from './componentes/Entradas';
 import Boton from './componentes/Boton';
 import GoogleButton from './componentes/GoogleBoton';
+import MicrosoftButton from "./componentes/MicrosoftBoton";
 import { toast } from 'react-hot-toast';
 
-type Variant = 'LOGIN' | 'REGISTER';
+
+
+
+type Variant = 'LOGIN' | 'REGISTER' | 'REGISTERALQUILANTE';
 
 const AuthForm = () => {
   const session = useSession();
@@ -32,6 +36,7 @@ const AuthForm = () => {
   } = useForm<FieldValues>({
     defaultValues: {
       nombre: '',
+      apellido: '',
       email: '',
       contrasena: '',
       telefono: '',
@@ -44,12 +49,12 @@ const AuthForm = () => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files && files.length > 0 && variant === 'REGISTER') {
+    if (files && files.length > 0 && (variant === 'REGISTER' || variant === 'REGISTERALQUILANTE')) {
       const file = files[0];
       const reader = new FileReader();
       reader.onloadend = () => {
         setFotoUrl(reader.result as string);
-        setShowPhotoUpload(false); // Ocultar el botón de subir foto después de cargarla con éxito
+        setShowPhotoUpload(false);
       };
       reader.readAsDataURL(file);
     }
@@ -122,24 +127,25 @@ const AuthForm = () => {
   }, [session, setValue]);
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="max-w-md w-full p-6 bg-white border border-black rounded-md shadow-md">
-        <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-8">
+    <div className="flex justify-center items-center min-h-screen relative">
+      
+      <div className="bg-white bg-opacity-80 p-6 rounded-lg shadow-lg z-10 max-w-md w-full space-y-6">
+        <h2 className="text-3xl font-bold text-center text-gray-900">
           {variant === 'LOGIN' ? 'Inicia Sesión' : 'Regístrate'}
         </h2>
-        {variant === 'REGISTER' && fotoUrl && (
+        {variant !== 'LOGIN' && fotoUrl && (
           <img src={fotoUrl} alt="Foto de perfil" className="mx-auto rounded-full w-24 h-24 mb-4" />
         )}
-        {variant === 'REGISTER' && showPhotoUpload && (
+        {variant !== 'LOGIN' && showPhotoUpload && (
           <div className="flex justify-center mb-4">
             <label htmlFor="upload-photo" className="cursor-pointer">
-              <img src='./'></img>
+              <img src='./upload_icon.png'></img>
               <input id="upload-photo" type="file" className="hidden" onChange={handleFileChange} />
             </label>
           </div>
         )}
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          {variant === 'REGISTER' && (
+          {variant !== 'LOGIN' && (
             <>
               <Entrada
                 disabled={false}
@@ -154,42 +160,54 @@ const AuthForm = () => {
                 register={register}
                 errors={errors}
                 required
-                id="telefono"
-                label="Teléfono"
+                id="apellido"
+                label="Apellido"
               />
-              <Entrada
-                disabled={false}
-                register={register}
-                errors={errors}
-                required
-                id="direccion"
-                label="Dirección"
-              />
-              <Entrada
-                disabled={false}
-                register={register}
-                errors={errors}
-                required
-                id="ciudad"
-                label="Ciudad"
-              />
-              <Entrada
-                disabled={false}
-                register={register}
-                errors={errors}
-                required
-                id="fechaNacimiento"
-                label="Fecha de Nacimiento"
-                type="date"
-              />
-              <Entrada
-                disabled={false}
-                register={register}
-                errors={errors}
-                required
-                id="ci"
-                label="Carnet de Identidad"
-              />
+              {variant === 'REGISTERALQUILANTE' && (
+                <>
+                  <Entrada
+                    disabled={false}
+                    register={register}
+                    errors={errors}
+                    required
+                    id="telefono"
+                    label="Teléfono"
+                  />
+                  <Entrada
+                    disabled={false}
+                    register={register}
+                    errors={errors}
+                    required
+                    id="direccion"
+                    label="Dirección"
+                  />
+                  <Entrada
+                    disabled={false}
+                    register={register}
+                    errors={errors}
+                    required
+                    id="ciudad"
+                    label="Ciudad"
+                  />
+                  <Entrada
+                    disabled={false}
+                    register={register}
+                    errors={errors}
+                    required
+                    id="fechaNacimiento"
+                    label="Fecha de Nacimiento"
+                    type="date"
+                  />
+                  <Entrada
+                    disabled={false}
+                    register={register}
+                    errors={errors}
+                    required
+                    id="ci"
+                    label="Carnet de Identidad"
+                  />
+                </>
+              )}
             </>
           )}
           <Entrada
@@ -209,13 +227,14 @@ const AuthForm = () => {
             id="contrasena"
             label="Contraseña"
             type="password"
+            
           />
           <Boton fullWidth type="submit">
             {variant === 'LOGIN' ? 'Iniciar Sesión' : 'Registrarse'}
           </Boton>
           <div className="flex justify-center">
-            <div onClick={() => setVariant(variant === 'LOGIN' ? 'REGISTER' : 'LOGIN')} className="cursor-pointer text-sm text-blue-500 hover:text-blue-700">
-              {variant === 'LOGIN' ? '¿No tienes una cuenta? Regístrate' : '¿Ya tienes una cuenta? Iniciar Sesión'}
+            <div onClick={() => setVariant(variant === 'LOGIN' ? 'REGISTER' : variant === 'REGISTER' ? 'REGISTERALQUILANTE' : 'LOGIN')} className="cursor-pointer text-sm text-blue-500 hover:text-blue-700">
+              {variant === 'LOGIN' ? '¿No tienes una cuenta? Regístrate' : variant === 'REGISTER' ? '¿Quieres ser alquilante? Regístrate aquí' : '¿Ya tienes una cuenta? Iniciar Sesión'}
             </div>
           </div>
         </form>
@@ -226,7 +245,7 @@ const AuthForm = () => {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-white px-2 text-gray-500">Iniciar Sesión con</span>
+                <span className="bg-white px-2 text-gray-500">Iniciar sesión con</span>
               </div>
             </div>
             <div className="mt-6 grid grid-cols-2 gap-3">
@@ -234,10 +253,13 @@ const AuthForm = () => {
                 <GoogleButton onClick={() => handleSignIn('google')} />
               </div>
               <div>
+                <MicrosoftButton onClick={() => handleSignIn('azure-ad')} />
               </div>
             </div>
           </div>
         )}
+
+        
       </div>
     </div>
   );

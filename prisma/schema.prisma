@@ -11,11 +11,11 @@ model usuario {
   id                       Int            @id @default(autoincrement())
   nombre                   String
   apellido                 String
-  telefono                 String         @unique
-  direccion                String
+  telefono                 String?         @unique
+  direccion                String?
   email                    String         @unique
   contrasena               String
-  ciudad                   String
+  ciudad                   String?
   fotoUrl                  String
   fechaNacimiento          String?
   fechaDeRegistro          DateTime       @default(now())
@@ -25,7 +25,8 @@ model usuario {
   calificacionesRecibidas  calificacion[] @relation("CalificacionesRecibidas")
   calificacionesRealizadas calificacion[] @relation("CalificacionesRealizadas")
   comentarios              comentario[]
-  cuartos                  cuarto[]       @relation("UsuarioCuartos")
+  cuartosPropios           cuarto[]       @relation("PropietarioCuartos")
+  cuartosAlquilados        cuarto[]       @relation("UsuarioCuartos")    
   deudas                   deuda[]
   mensajesEnviados         mensaje[]      @relation("MensajesEnviados")
   mensajesRecibidos        mensaje[]      @relation("MensajesRecibidos")
@@ -37,19 +38,21 @@ model cuarto {
   id                Int          @id @default(autoincrement())
   direccion         String
   ubicacionId       Int
+  fotoUrlcuarto     String
   descripcion       String
   condiciones       String
   precio            Int
-  nombrePropietario String
+  propietarioId     Int          
   tipoCuarto        TipoCuarto
   estadoCuarto      EstadoCuarto
-  usuarioId         Int
   comentarios       comentario[] @relation("CuartoComentarios")
   ubicacion         ubicacion    @relation("CuartoUbicacion", fields: [ubicacionId], references: [id])
-  usuario           usuario      @relation("UsuarioCuartos", fields: [usuarioId], references: [id])
+  propietario       usuario      @relation("PropietarioCuartos", fields: [propietarioId], references: [id])
+  arrendatarios     usuario[]    @relation("UsuarioCuartos") 
   ofertas           oferta[]
   pagos             pagos[]      @relation("PagosCuarto")
 }
+
 
 model comentario {
   id            Int      @id @default(autoincrement())

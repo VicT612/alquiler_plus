@@ -1,11 +1,11 @@
 import React from "react";
-import { FcGoogle } from "react-icons/fc";
+import { IoLogoMicrosoft } from "react-icons/io5";
 
-interface GoogleButtonProps {
+interface MicrosoftButtonProps {
   onClick: () => void;
 }
 
-const GoogleButton: React.FC<GoogleButtonProps> = ({ onClick }) => {
+const MicrosoftButton: React.FC<MicrosoftButtonProps> = ({ onClick }) => {
   return (
     <button
       type="button"
@@ -28,9 +28,9 @@ const GoogleButton: React.FC<GoogleButtonProps> = ({ onClick }) => {
         transition duration-300 ease-in-out  // Agregando transición
       "
     >
-    <FcGoogle/>
+      <IoLogoMicrosoft/>
     </button>
   );
 };
 
-export default GoogleButton;
+export default MicrosoftButton;

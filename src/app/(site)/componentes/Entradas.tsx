@@ -34,15 +34,15 @@ const Entrada: React.FC<InputProps> = ({
       )}
       <div className="mt-1">
         <input
-          {...register(id)} // Integración con react-hook-form
+          {...register(id)}
           id={id}
           type={type}
           required={required}
           disabled={disabled}
           placeholder={placeholder}
           onChange={onChange}
-          value={value} // Establecer el valor del input
-          className={`shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
+          value={value}
+          className={`text-black shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
             errors && errors[id] ? 'border-red-500' : ''
           }`}
         />

@@ -11,18 +11,22 @@
   "dependencies": {
     "@prisma/client": "^5.14.0",
     "axios": "^1.6.8",
+    "leaflet": "^1.9.4",
     "next": "14.2.3",
     "next-auth": "^4.24.7",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.51.4",
     "react-hot-toast": "^2.4.1",
-    "react-icons": "^5.2.1"
+    "react-icons": "^5.2.1",
+    "three": "^0.164.1"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.12",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/three": "^0.164.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
