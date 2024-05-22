@@ -11,7 +11,7 @@ const Mapa = () => {
     // Verificar si el mapa ya está inicializado antes de crearlo
     if (!document.getElementById('map').classList.contains('leaflet-container')) {
       // Inicializar mapa solo si el contenedor no tiene la clase de Leaflet
-      const newMap = L.map('map').setView([51.505, -0.09], 13);
+      const newMap = L.map('map').setView([51.503, -0.09], 13); // Ajustar la vista inicial más al sur
       setMap(newMap);
 
       // Agregar capa de azulejos (tiles)
@@ -33,47 +33,43 @@ const Mapa = () => {
 
   useEffect(() => {
     if (map) {
-      // Obtener la ubicación del usuario
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          const { latitude, longitude } = position.coords;
-          const userLatLng = [latitude, longitude];
+      const geoOptions = {
+        enableHighAccuracy: true,
+        timeout: 1000,
+        maximumAge: 0
+      };
 
-          // Crear un marcador para la ubicación del usuario si no existe
-          if (!userMarker) {
-            const marker = L.marker(userLatLng).addTo(map);
-            setUserMarker(marker);
-          } else {
-            // Actualizar la posición del marcador del usuario
-            userMarker.setLatLng(userLatLng);
-          }
-
-          // Centrar el mapa en la ubicación del usuario
-          map.setView(userLatLng, 13);
-        },
-        error => {
-          console.error('Error al obtener la ubicación del usuario:', error);
-        }
-      );
-
-      // Actualizar la ubicación del usuario cada 10 segundos
-      const intervalId = setInterval(() => {
+      // Función para obtener la ubicación del usuario
+      const getUserLocation = () => {
         navigator.geolocation.getCurrentPosition(
           position => {
             const { latitude, longitude } = position.coords;
             const userLatLng = [latitude, longitude];
 
-            // Actualizar la posición del marcador del usuario
-            userMarker.setLatLng(userLatLng);
+            // Crear un marcador para la ubicación del usuario si no existe
+            if (!userMarker) {
+              const marker = L.marker(userLatLng).addTo(map);
+              setUserMarker(marker);
+            } else {
+              // Actualizar la posición del marcador del usuario
+              userMarker.setLatLng(userLatLng);
+            }
 
             // Centrar el mapa en la ubicación del usuario
-            map.setView(userLatLng, 13);
+            map.setView(userLatLng, 18);
           },
           error => {
             console.error('Error al obtener la ubicación del usuario:', error);
-          }
+          },
+          geoOptions
         );
-      }, 10000);
+      };
+
+      // Obtener la ubicación inicial del usuario
+      getUserLocation();
+
+      // Actualizar la ubicación del usuario cada 10 segundos
+      const intervalId = setInterval(getUserLocation, 1000);
 
       // Limpiar el intervalo al desmontar el componente
       return () => clearInterval(intervalId);

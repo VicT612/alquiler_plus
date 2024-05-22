@@ -9,18 +9,23 @@ import Boton from './componentes/Boton';
 import GoogleButton from './componentes/GoogleBoton';
 import MicrosoftButton from "./componentes/MicrosoftBoton";
 import { toast } from 'react-hot-toast';
-
-
-
+import MapaModal from './componentes/MapaModal'; // Importa el componente del modal
 
 type Variant = 'LOGIN' | 'REGISTER' | 'REGISTERALQUILANTE';
 
-const AuthForm = () => {
+interface Position {
+  lat: number;
+  lng: number;
+}
+
+const AuthForm: React.FC = () => {
   const session = useSession();
   const [variant, setVariant] = useState<Variant>('LOGIN');
   const [isLoading, setIsLoading] = useState(false);
   const [fotoUrl, setFotoUrl] = useState<string>('');
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
+  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
+  const [address, setAddress] = useState<string>(''); // Estado para almacenar la dirección
   const router = useRouter();
 
   const handleSignIn = async (provider: 'google' | 'azure-ad') => {
@@ -58,6 +63,11 @@ const AuthForm = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleAddressSave = (position: Position) => {
+    setAddress(`${position.lat}, ${position.lng}`);
+    setValue('direccion', `${position.lat}, ${position.lng}`);
   };
 
   const onSubmit: SubmitHandler<FieldValues> = async (data, event) => {
@@ -128,7 +138,6 @@ const AuthForm = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen relative">
-      
       <div className="bg-white bg-opacity-80 p-6 rounded-lg shadow-lg z-10 max-w-md w-full space-y-6">
         <h2 className="text-3xl font-bold text-center text-gray-900">
           {variant === 'LOGIN' ? 'Inicia Sesión' : 'Regístrate'}
@@ -139,7 +148,7 @@ const AuthForm = () => {
         {variant !== 'LOGIN' && showPhotoUpload && (
           <div className="flex justify-center mb-4">
             <label htmlFor="upload-photo" className="cursor-pointer">
-              <img src='./upload_icon.png'></img>
+              <img src='./upload_icon.png' alt="Subir foto" />
               <input id="upload-photo" type="file" className="hidden" onChange={handleFileChange} />
             </label>
           </div>
@@ -173,14 +182,16 @@ const AuthForm = () => {
                     id="telefono"
                     label="Teléfono"
                   />
-                  <Entrada
-                    disabled={false}
-                    register={register}
-                    errors={errors}
-                    required
-                    id="direccion"
-                    label="Dirección"
-                  />
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Dirección</label>
+                    <button
+                      type="button"
+                      onClick={() => setShowModal(true)}
+                      className="w-full px-3 py-2 border rounded-md shadow-sm text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      {address || "Selecciona tu dirección"}
+                    </button>
+                  </div>
                   <Entrada
                     disabled={false}
                     register={register}
@@ -227,7 +238,6 @@ const AuthForm = () => {
             id="contrasena"
             label="Contraseña"
             type="password"
-            
           />
           <Boton fullWidth type="submit">
             {variant === 'LOGIN' ? 'Iniciar Sesión' : 'Registrarse'}
@@ -258,9 +268,8 @@ const AuthForm = () => {
             </div>
           </div>
         )}
-
-        
       </div>
+      <MapaModal show={showModal} onClose={() => setShowModal(false)} onSave={handleAddressSave} />
     </div>
   );
 };

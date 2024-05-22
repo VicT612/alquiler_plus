@@ -32,6 +32,8 @@ model usuario {
   mensajesRecibidos        mensaje[]      @relation("MensajesRecibidos")
   pagos                    pagos[]
   reportes                 reportes[]
+  ubicacionId              Int?      
+  ubicacion                ubicacion?     @relation(fields: [ubicacionId], references: [id])
 }
 
 model cuarto {
@@ -71,6 +73,7 @@ model ubicacion {
   longitud   Float
   beneficios String
   cuartos    cuarto[] @relation("CuartoUbicacion")
+  usuarios   usuario[] // Agrega esta relación
 }
 
 model mensaje {

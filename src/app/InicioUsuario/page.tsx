@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Card from "./cardCuartos/cardCuartos";
 import dynamic from "next/dynamic";
 
-const DynamicMapa = dynamic(() => import("@/app/InicioPropietario/components/UbicacionModal"), {
+const DynamicMapa = dynamic(() => import("../InicioPropietario/components/UbicacionModal"), {
   loading: () => <div>Cargando...</div>,
   ssr: false,
 });
@@ -70,13 +70,14 @@ const AboutRoom = () => {
         </button>
       </div>
       <p>Conoce tu ubicación</p>
-      <DynamicMapa/>
       
       <div className="card-container">
+        <DynamicMapa/>
         {cuartos.map((cuarto) => (
           <Card key={cuarto.id} cuarto={cuarto} />
         ))}
       </div>
+     
 
       <style jsx>{`
         .app {

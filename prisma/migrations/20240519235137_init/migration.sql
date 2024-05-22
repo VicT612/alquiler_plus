@@ -23,6 +23,7 @@ CREATE TABLE "usuario" (
     "ci" TEXT NOT NULL,
     "rol" "UserRole" NOT NULL DEFAULT 'USUARIO',
     "tutorialCompletado" BOOLEAN NOT NULL DEFAULT false,
+    "ubicacionId" INTEGER,
 
     CONSTRAINT "usuario_pkey" PRIMARY KEY ("id")
 );
@@ -152,6 +153,9 @@ CREATE UNIQUE INDEX "_UsuarioCuartos_AB_unique" ON "_UsuarioCuartos"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_UsuarioCuartos_B_index" ON "_UsuarioCuartos"("B");
+
+-- AddForeignKey
+ALTER TABLE "usuario" ADD CONSTRAINT "usuario_ubicacionId_fkey" FOREIGN KEY ("ubicacionId") REFERENCES "ubicacion"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "cuarto" ADD CONSTRAINT "cuarto_ubicacionId_fkey" FOREIGN KEY ("ubicacionId") REFERENCES "ubicacion"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
