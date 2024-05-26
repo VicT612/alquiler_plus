@@ -1,4 +1,3 @@
-// src/app/(site)/page.tsx
 'use client';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
@@ -20,7 +19,6 @@ interface Position {
 }
 
 const AuthForm: React.FC = () => {
-  const session = useSession();
   const [variant, setVariant] = useState<Variant>('LOGIN');
   const [isLoading, setIsLoading] = useState(false);
   const [fotoUrl, setFotoUrl] = useState<string>('');
@@ -95,14 +93,18 @@ const AuthForm: React.FC = () => {
         event.preventDefault();
       }
       setIsLoading(true);
-
+  
       let response;
       if (variant === 'LOGIN') {
         response = await axios.post('/api/inicio', { email: data.email, contrasena: data.contrasena });
-        const { token, rol } = response.data;
+        const { token, rol, user } = response.data;
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         localStorage.setItem('token', token);
-
+  
+        // Guardar los datos del usuario en localStorage
+        localStorage.setItem('user', JSON.stringify(user));
+  
+        // Redirigir según el rol del usuario
         switch (rol) {
           case 'USUARIO':
             router.push('/InicioUsuario');
@@ -130,32 +132,13 @@ const AuthForm: React.FC = () => {
         router.push('/');
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error(error);
       toast.error('Something went wrong!');
     } finally {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (session?.status === 'authenticated') {
-      router.push('/');
-    }
-  }, [session, router]);
-
-  useEffect(() => {
-    if (session?.data?.user) {
-      setValue('nombre', session.data.user.name);
-      setValue('email', session.data.user.email);
-      if (session.data.user.image) {
-        setFotoUrl(session.data.user.image);
-      } else {
-        setShowPhotoUpload(true);
-      }
-    } else {
-      setShowPhotoUpload(true);
-    }
-  }, [session, setValue]);
+  
 
   return (
     <div className="flex justify-center items-center min-h-screen relative">

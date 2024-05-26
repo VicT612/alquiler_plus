@@ -43,7 +43,7 @@ export async function POST(request: Request) {
                 fotoUrl,
                 fechaNacimiento,
                 ci,
-                rol: 'ARRENDADOR'
+                rol: 'USUARIO'
             }
         });
 
