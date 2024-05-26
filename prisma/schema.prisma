@@ -19,7 +19,7 @@ model usuario {
   fotoUrl                  String
   fechaNacimiento          String?
   fechaDeRegistro          DateTime       @default(now())
-  ci                       String         @unique
+  ci                       String?         @unique
   rol                      UserRole       @default(USUARIO)
   tutorialCompletado       Boolean        @default(false)
   calificacionesRecibidas  calificacion[] @relation("CalificacionesRecibidas")

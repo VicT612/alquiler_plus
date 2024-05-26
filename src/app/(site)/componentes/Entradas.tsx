@@ -28,7 +28,7 @@ const Entrada: React.FC<InputProps> = ({
   return (
     <div className="mb-4">
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+        <label htmlFor={id} className="block text-sm font-medium dark:text-white text-black">
           {label}
         </label>
       )}
@@ -42,13 +42,15 @@ const Entrada: React.FC<InputProps> = ({
           placeholder={placeholder}
           onChange={onChange}
           value={value}
-          className={`text-black shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
-            errors && errors[id] ? 'border-red-500' : ''
+          className={`text-black shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full h-full p-2 sm:text-sm border-gray-300 rounded-md ${
+            errors && errors[id] ? 'border-red-500' : '' 
           }`}
         />
       </div>
       {errors && errors[id] && (
         <p className="mt-2 text-sm text-red-600" id={`${id}-error`}>
+
+
           {errors[id].message}
         </p>
       )}

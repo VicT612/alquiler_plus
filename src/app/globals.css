@@ -11,19 +11,15 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 244, 254, 254;
-    --background-start-rgb: 0, 0, 0;
+    --background-start-rgb: 61, 62, 60;
     --background-end-rgb: 0, 0, 0;
   }
 }
 
 body {
+  font-family: fantasy;
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background:rgb(var(--background-start-rgb));
 }
 
 @layer utilities {

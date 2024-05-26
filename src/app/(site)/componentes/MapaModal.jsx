@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import 'tailwindcss/tailwind.css';
 import axios from 'axios';
 
-const MapaModal = ({ show, onClose, onSave }) => { 
+const MapaModal = ({ show, onClose, onSave }) => {
   const [map, setMap] = useState(null); // Estado para almacenar la instancia del mapa
   const [userMarker, setUserMarker] = useState(null); // Estado para almacenar el marcador del usuario
   const [selectedPosition, setSelectedPosition] = useState(null); // Estado para almacenar la posición seleccionada
@@ -29,6 +29,14 @@ const MapaModal = ({ show, onClose, onSave }) => {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' // Atribución a OpenStreetMap
       }).addTo(newMap); // Añade la capa de tiles al mapa
 
+      // Crea un icono personalizado para el marcador utilizando la imagen PNG
+      const markerIcon = L.icon({
+        iconUrl: './marker.webp', // Utiliza la imagen PNG como icono del marcador
+        iconSize: [30, 30], // Establece el tamaño del icono (ajusta según sea necesario)
+        iconAnchor: [15, 30], // Establece el punto de anclaje del icono (la mitad de la imagen)
+        popupAnchor: [0, -30] // Ajusta la posición del popup en relación al icono
+      });
+
       // Obtener la ubicación actual del usuario
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
@@ -36,7 +44,7 @@ const MapaModal = ({ show, onClose, onSave }) => {
           const userLatLng = L.latLng(latitude, longitude); // Crea un objeto de latitud y longitud
           newMap.setView(userLatLng, 19); // Ajusta la vista del mapa a la ubicación del usuario con el zoom máximo
           setSelectedPosition(userLatLng); // Actualiza la posición seleccionada con la ubicación actual
-          const marker = L.marker(userLatLng, { draggable: true }).addTo(newMap); // Crea un marcador arrastrable en la ubicación actual
+          const marker = L.marker(userLatLng, { icon: markerIcon, draggable: true }).addTo(newMap); // Crea un marcador arrastrable en la ubicación actual
           setUserMarker(marker); // Guarda el marcador en el estado
 
           // Actualiza la posición seleccionada cuando se arrastra el marcador
@@ -72,7 +80,7 @@ const MapaModal = ({ show, onClose, onSave }) => {
         console.log(`País: ${country}`);
         
       } catch (error) {
-        console.error('Error fetching address:', error); // Muestra un error en la consola si la solicitud falla
+        console.error('Error al obtener la dirección:', error); // Muestra un error en la consola si la solicitud falla
       }
     }
     onClose(); // Cierra el modal

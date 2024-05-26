@@ -61,10 +61,11 @@ const Home = () => {
 
   // Renderiza el formulario
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Panel de Control - Agregar Cuarto</h2>
-    
-      <div className="bg-white rounded-lg shadow p-6">
+    <div className="container w-full ">
+      <div className="flex flex-col justify-center bg-yellow-300 h-12 pl-5 pt-3 ">
+        <h2 className="text-2xl font-bold mb-4 ">Panel de Control - Agregar Cuarto</h2>
+      </div>
+      <div className="dark:bg-slate-700 bg-white rounded-lg shadow p-6 ml-30 mr-30 mt-10 h-3/4 text-white ">
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="mb-4">
@@ -75,7 +76,7 @@ const Home = () => {
                 name="precio"
                 value={formData.precio}
                 onChange={handleInputChange}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 text-black"
               />
             </div>
             <div className="mb-4">
@@ -86,7 +87,7 @@ const Home = () => {
                 name="caracteristicas"
                 value={formData.descripcion}
                 onChange={handleInputChange}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 text-black"
               />
             </div>
             <div className="mb-4">
@@ -109,7 +110,7 @@ const Home = () => {
                 name="estado"
                 value={formData.estadoCuarto}
                 onChange={handleInputChange}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 text-black"
               >
                 <option value="DESOCUPADO">Desocupado</option>
                 <option value="EN_CONTRATO">En Contrato</option>
@@ -124,7 +125,7 @@ const Home = () => {
                 name="foto"
                 accept="image/*"
                 onChange={handleFileChange}
-                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 text-black"
               />
             </div>
           </div>

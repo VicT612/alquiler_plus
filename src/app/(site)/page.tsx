@@ -1,5 +1,6 @@
-'use client'
-import { useRouter } from "next/navigation";
+// src/app/(site)/page.tsx
+'use client';
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import axios from 'axios';
@@ -7,9 +8,9 @@ import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import Entrada from './componentes/Entradas';
 import Boton from './componentes/Boton';
 import GoogleButton from './componentes/GoogleBoton';
-import MicrosoftButton from "./componentes/MicrosoftBoton";
+import MicrosoftButton from './componentes/MicrosoftBoton';
 import { toast } from 'react-hot-toast';
-import MapaModal from './componentes/MapaModal'; // Importa el componente del modal
+import MapaModal from './componentes/MapaModal';
 
 type Variant = 'LOGIN' | 'REGISTER' | 'REGISTERALQUILANTE';
 
@@ -24,21 +25,39 @@ const AuthForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [fotoUrl, setFotoUrl] = useState<string>('');
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
-  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
-  const [address, setAddress] = useState<string>(''); // Estado para almacenar la dirección
+  const [showModal, setShowModal] = useState(false);
+  const [address, setAddress] = useState<string>('');
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const router = useRouter();
+
+  useEffect(() => {
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      setIsDarkMode(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      setIsDarkMode(false);
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    if (document.documentElement.classList.contains('dark')) {
+      document.documentElement.classList.remove('dark');
+      localStorage.theme = 'light';
+      setIsDarkMode(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.theme = 'dark';
+      setIsDarkMode(true);
+    }
+  };
 
   const handleSignIn = async (provider: 'google' | 'azure-ad') => {
     setIsLoading(true);
     signIn(provider);
   };
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<FieldValues>({
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FieldValues>({
     defaultValues: {
       nombre: '',
       apellido: '',
@@ -76,16 +95,14 @@ const AuthForm: React.FC = () => {
         event.preventDefault();
       }
       setIsLoading(true);
-  
+
       let response;
       if (variant === 'LOGIN') {
         response = await axios.post('/api/inicio', { email: data.email, contrasena: data.contrasena });
-      } else {
-        response = await axios.post('/api/agregar', { ...data, fotoUrl });
-      }
-  
-      if (variant === 'LOGIN') {
-        const rol = response.data.rol;
+        const { token, rol } = response.data;
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        localStorage.setItem('token', token);
+
         switch (rol) {
           case 'USUARIO':
             router.push('/InicioUsuario');
@@ -103,8 +120,13 @@ const AuthForm: React.FC = () => {
             router.push('/');
             break;
         }
+      } else if (variant === 'REGISTERALQUILANTE') {
+        response = await axios.post('/api/agregarArrendador', { ...data, fotoUrl });
+        toast.success('Arrendador registrado exitosamente');
+        router.push('/');
       } else {
-        toast.success('Usuario registrado exitosamente');
+        response = await axios.post('/api/agregarCliente', { ...data, fotoUrl });
+        toast.success('Cliente registrado exitosamente');
         router.push('/');
       }
     } catch (error) {
@@ -114,7 +136,6 @@ const AuthForm: React.FC = () => {
       setIsLoading(false);
     }
   };
-  
 
   useEffect(() => {
     if (session?.status === 'authenticated') {
@@ -138,13 +159,10 @@ const AuthForm: React.FC = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen relative">
-      <div className="bg-white bg-opacity-80 p-6 rounded-lg shadow-lg z-10 max-w-md w-full space-y-6">
-        <h2 className="text-3xl font-bold text-center text-gray-900">
+      <div className="bg-white dark:bg-sky-950 bg-opacity-80 p-6 rounded-lg shadow-lg z-10 max-w-md w-full space-y-6">
+        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">
           {variant === 'LOGIN' ? 'Inicia Sesión' : 'Regístrate'}
         </h2>
-        {variant !== 'LOGIN' && fotoUrl && (
-          <img src={fotoUrl} alt="Foto de perfil" className="mx-auto rounded-full w-24 h-24 mb-4" />
-        )}
         {variant !== 'LOGIN' && showPhotoUpload && (
           <div className="flex justify-center mb-4">
             <label htmlFor="upload-photo" className="cursor-pointer">
@@ -239,11 +257,12 @@ const AuthForm: React.FC = () => {
             label="Contraseña"
             type="password"
           />
+          
           <Boton fullWidth type="submit">
             {variant === 'LOGIN' ? 'Iniciar Sesión' : 'Registrarse'}
           </Boton>
-          <div className="flex justify-center">
-            <div onClick={() => setVariant(variant === 'LOGIN' ? 'REGISTER' : variant === 'REGISTER' ? 'REGISTERALQUILANTE' : 'LOGIN')} className="cursor-pointer text-sm text-blue-500 hover:text-blue-700">
+          <div className="flex justifycenter">
+            <div onClick={() => setVariant(variant === 'LOGIN' ? 'REGISTER' : variant === 'REGISTER' ? 'REGISTERALQUILANTE' : 'LOGIN')} className="cursor-pointer text-sm text-cyan-500 hover:text-cyan-300">
               {variant === 'LOGIN' ? '¿No tienes una cuenta? Regístrate' : variant === 'REGISTER' ? '¿Quieres ser alquilante? Regístrate aquí' : '¿Ya tienes una cuenta? Iniciar Sesión'}
             </div>
           </div>
@@ -255,7 +274,7 @@ const AuthForm: React.FC = () => {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-white px-2 text-gray-500">Iniciar sesión con</span>
+                <span className="bg-white dark:bg-sky-950 px-2 text-black dark:text-white">Iniciar sesión con</span>
               </div>
             </div>
             <div className="mt-6 grid grid-cols-2 gap-3">
@@ -268,6 +287,12 @@ const AuthForm: React.FC = () => {
             </div>
           </div>
         )}
+        <button
+          onClick={toggleDarkMode}
+          className="mt-6 w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 py-2 rounded-lg shadow-md"
+        >
+          {isDarkMode ? 'Modo Claro' : 'Modo Oscuro'}
+        </button>
       </div>
       <MapaModal show={showModal} onClose={() => setShowModal(false)} onSave={handleAddressSave} />
     </div>

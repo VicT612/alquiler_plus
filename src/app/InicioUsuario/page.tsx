@@ -63,7 +63,7 @@ const AboutRoom = () => {
       <div className="header">
         <h1 className="text-4xl font-bold mb-4">Detalles del Cuarto</h1>
         <button 
-          className={`ml-auto px-2 py-1 rounded-lg ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-800'} focus:outline-none`}
+          className={`ml-auto px-2 py-1 rounded-lg ${darkMode ? 'bg-red-900 text-white' : 'bg-red-300 text-gray-800'} focus:outline-none`}
           onClick={() => setDarkMode(!darkMode)}
         >
           {darkMode ? 'Modo Claro' : 'Modo Oscuro'}
@@ -92,8 +92,8 @@ const AboutRoom = () => {
           width: 100%;
           display: flex;
           align-items: center;
-          padding: 20px;
-          background-color: ${darkMode ? '#333' : '#f0f0f0'};
+          padding: 7px;
+          background-color: ${darkMode ? '#E63858  ' : '#E63858  '};
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 

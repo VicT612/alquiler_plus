@@ -19,8 +19,8 @@ const Boton: React.FC<ButtonProps> = ({
   const sizeStyles = "text-sm px-4 py-2";
   const fullWidthStyles = fullWidth ? "w-full" : "";
 
-  const lightStyles = "text-white bg-red-400 hover:bg-red-500 border-transparent hover:shadow";
-  const darkStyles = "dark:text-white dark:bg-red-600 dark:hover:bg-red-700 dark:border-transparent";
+  const lightStyles = "text-white bg-rose-600 hover:bg-red-500 border-transparent hover:shadow";
+  const darkStyles = "dark:text-white dark:bg-rose-600 dark:hover:bg-red-700 dark:border-transparent";
 
   const handleClick = () => {
     if (onClick) {

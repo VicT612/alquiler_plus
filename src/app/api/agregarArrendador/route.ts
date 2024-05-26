@@ -6,27 +6,16 @@ import bcrypt from 'bcryptjs';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const {
-            email,
-            nombre,
-            apellido,
-            contrasena,
-            telefono,
-            direccion,
-            ciudad,
-            fotoUrl,
-            fechaNacimiento,
-            ci
-        } = body;
+        const { email, nombre, apellido, contrasena, telefono, direccion, ciudad, fotoUrl, fechaNacimiento, ci, rol} = body;
 
-        // Verificar si el teléfono o email ya existen
-        const existingUserByPhone = await db.usuario.findUnique({ where: { telefono } });
         const existingUserByEmail = await db.usuario.findUnique({ where: { email } });
-        if (existingUserByPhone) {
-            return NextResponse.json({ message: "El teléfono ya está registrado" }, { status: 400 });
-        }
         if (existingUserByEmail) {
             return NextResponse.json({ message: "El correo electrónico ya está registrado" }, { status: 400 });
+        }
+
+        const existingUserByPhone = await db.usuario.findUnique({ where: { telefono } });
+        if (existingUserByPhone) {
+            return NextResponse.json({ message: "El teléfono ya está registrado" }, { status: 400 });
         }
 
         const hashedPassword = await bcrypt.hash(contrasena, 10);
@@ -43,7 +32,7 @@ export async function POST(request: Request) {
                 fotoUrl,
                 fechaNacimiento,
                 ci,
-                rol: 'ARRENDADOR'
+                rol: 'PROPIETARIO'
             }
         });
 
