@@ -11,7 +11,7 @@ model usuario {
   id                       Int            @id @default(autoincrement())
   nombre                   String
   apellido                 String
-  telefono                 String?         @unique
+  telefono                 String?        @unique
   direccion                String?
   email                    String         @unique
   contrasena               String
@@ -19,42 +19,41 @@ model usuario {
   fotoUrl                  String
   fechaNacimiento          String?
   fechaDeRegistro          DateTime       @default(now())
-  ci                       String?         @unique
+  ci                       String?        @unique
   rol                      UserRole       @default(USUARIO)
   tutorialCompletado       Boolean        @default(false)
+  ubicacionId              Int?
   calificacionesRecibidas  calificacion[] @relation("CalificacionesRecibidas")
   calificacionesRealizadas calificacion[] @relation("CalificacionesRealizadas")
   comentarios              comentario[]
   cuartosPropios           cuarto[]       @relation("PropietarioCuartos")
-  cuartosAlquilados        cuarto[]       @relation("UsuarioCuartos")    
   deudas                   deuda[]
   mensajesEnviados         mensaje[]      @relation("MensajesEnviados")
   mensajesRecibidos        mensaje[]      @relation("MensajesRecibidos")
   pagos                    pagos[]
   reportes                 reportes[]
-  ubicacionId              Int?      
   ubicacion                ubicacion?     @relation(fields: [ubicacionId], references: [id])
+  cuartosAlquilados        cuarto[]       @relation("UsuarioCuartos")
 }
 
 model cuarto {
-  id                Int          @id @default(autoincrement())
-  direccion         String
-  ubicacionId       Int
-  fotoUrlcuarto     String
-  descripcion       String
-  condiciones       String
-  precio            Int
-  propietarioId     Int          
-  tipoCuarto        TipoCuarto
-  estadoCuarto      EstadoCuarto
-  comentarios       comentario[] @relation("CuartoComentarios")
-  ubicacion         ubicacion    @relation("CuartoUbicacion", fields: [ubicacionId], references: [id])
-  propietario       usuario      @relation("PropietarioCuartos", fields: [propietarioId], references: [id])
-  arrendatarios     usuario[]    @relation("UsuarioCuartos") 
-  ofertas           oferta[]
-  pagos             pagos[]      @relation("PagosCuarto")
+  id            Int          @id @default(autoincrement())
+  direccion     String
+  ubicacionId   Int
+  fotoUrlcuarto String
+  descripcion   String
+  condiciones   String
+  precio        Int
+  propietarioId Int
+  tipoCuarto    TipoCuarto
+  estadoCuarto  EstadoCuarto
+  comentarios   comentario[] @relation("CuartoComentarios")
+  propietario   usuario      @relation("PropietarioCuartos", fields: [propietarioId], references: [id])
+  ubicacion     ubicacion    @relation("CuartoUbicacion", fields: [ubicacionId], references: [id])
+  ofertas       oferta[]
+  pagos         pagos[]      @relation("PagosCuarto")
+  arrendatarios usuario[]    @relation("UsuarioCuartos")
 }
-
 
 model comentario {
   id            Int      @id @default(autoincrement())
@@ -68,12 +67,18 @@ model comentario {
 }
 
 model ubicacion {
-  id         Int      @id @default(autoincrement())
-  latitud    Float
-  longitud   Float
-  beneficios String
-  cuartos    cuarto[] @relation("CuartoUbicacion")
-  usuarios   usuario[] // Agrega esta relación
+  id           Int       @id @default(autoincrement())
+  latitud      Float
+  longitud     Float
+  beneficios   String?
+  Departamento String
+  barrio       String
+  calle        String
+  ciudad       String
+  pais         String
+  provincia    String
+  cuartos      cuarto[]  @relation("CuartoUbicacion")
+  usuarios     usuario[]
 }
 
 model mensaje {

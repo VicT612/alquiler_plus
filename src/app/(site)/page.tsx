@@ -8,15 +8,11 @@ import Entrada from './componentes/Entradas';
 import Boton from './componentes/Boton';
 import GoogleButton from './componentes/GoogleBoton';
 import MicrosoftButton from './componentes/MicrosoftBoton';
-import { toast } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
 import MapaModal from './componentes/MapaModal';
+import Cookies from 'js-cookie';
 
 type Variant = 'LOGIN' | 'REGISTER' | 'REGISTERALQUILANTE';
-
-interface Position {
-  lat: number;
-  lng: number;
-}
 
 const AuthForm: React.FC = () => {
   const [variant, setVariant] = useState<Variant>('LOGIN');
@@ -26,10 +22,12 @@ const AuthForm: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [address, setAddress] = useState<string>('');
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const [ubicacionId, setUbicacionId] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    const theme = Cookies.get('theme');
+    if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
       setIsDarkMode(true);
     } else {
@@ -37,18 +35,6 @@ const AuthForm: React.FC = () => {
       setIsDarkMode(false);
     }
   }, []);
-
-  const toggleDarkMode = () => {
-    if (document.documentElement.classList.contains('dark')) {
-      document.documentElement.classList.remove('dark');
-      localStorage.theme = 'light';
-      setIsDarkMode(false);
-    } else {
-      document.documentElement.classList.add('dark');
-      localStorage.theme = 'dark';
-      setIsDarkMode(true);
-    }
-  };
 
   const handleSignIn = async (provider: 'google' | 'azure-ad') => {
     setIsLoading(true);
@@ -82,10 +68,31 @@ const AuthForm: React.FC = () => {
     }
   };
 
-  const handleAddressSave = (position: Position) => {
-    setAddress(`${position.lat}, ${position.lng}`);
-    setValue('direccion', `${position.lat}, ${position.lng}`);
-  };
+  useEffect(() => {
+    if (variant === 'REGISTERALQUILANTE') {
+      const storedAddress = localStorage.getItem('Mapeado');
+      if (storedAddress) {
+        const addressData = JSON.parse(storedAddress);
+        const calle = addressData.calle || addressData.barrio;
+        setAddress(calle as string);
+        setValue('direccion', calle as string);
+        setValue('ciudad', addressData.ciudad as string);
+      }
+    }
+  }, [variant, setValue]);
+
+  useEffect(() => {
+    if (!showModal) {
+      const storedAddress = localStorage.getItem('Mapeado');
+      if (storedAddress) {
+        const addressData = JSON.parse(storedAddress);
+        const calle = addressData.calle || addressData.barrio;
+        setAddress(calle as string);
+        setValue('direccion', calle as string);
+        setValue('ciudad', addressData.ciudad as string);
+      }
+    }
+  }, [showModal, setValue]);
 
   const onSubmit: SubmitHandler<FieldValues> = async (data, event) => {
     try {
@@ -100,11 +107,9 @@ const AuthForm: React.FC = () => {
         const { token, rol, user } = response.data;
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         localStorage.setItem('token', token);
-  
-        // Guardar los datos del usuario en localStorage
         localStorage.setItem('user', JSON.stringify(user));
+        Cookies.set('rol', user.rol);
   
-        // Redirigir según el rol del usuario
         switch (rol) {
           case 'USUARIO':
             router.push('/InicioUsuario');
@@ -123,22 +128,50 @@ const AuthForm: React.FC = () => {
             break;
         }
       } else if (variant === 'REGISTERALQUILANTE') {
-        response = await axios.post('/api/agregarArrendador', { ...data, fotoUrl });
-        toast.success('Arrendador registrado exitosamente');
-        router.push('/');
+        if (!ubicacionId) {
+          toast.error('Debe seleccionar una dirección');
+          return;
+        }
+  
+        const storedAddress = localStorage.getItem('Mapeado');
+        if (storedAddress) {
+          const addressData = JSON.parse(storedAddress);
+          const { latitud, longitud, calle, barrio, ciudad, provincia, Departamento, pais, beneficios } = addressData;
+          const addressResponse = await axios.post('/api/agregarDireccion', {
+            latitud,
+            longitud,
+            calle,
+            barrio,
+            ciudad,
+            provincia,
+            Departamento,
+            pais,
+            beneficios,
+          });
+  
+          const ubicacionId = addressResponse.data.id;
+  
+          const propietarioResponse = await axios.post('/api/agregarArrendador', {
+            ...data,
+            fotoUrl,
+            ubicacionId,
+          });
+          toast.success('Arrendador registrado exitosamente');
+          router.push('/');
+        }
       } else {
         response = await axios.post('/api/agregarCliente', { ...data, fotoUrl });
         toast.success('Cliente registrado exitosamente');
         router.push('/');
       }
     } catch (error) {
-      console.error(error);
-      toast.error('Something went wrong!');
+      toast.error(axios.isAxiosError(error) ? error.response?.data.message : 'Error al iniciar sesión');
     } finally {
       setIsLoading(false);
     }
   };
   
+
 
   return (
     <div className="flex justify-center items-center min-h-screen relative">
@@ -184,11 +217,11 @@ const AuthForm: React.FC = () => {
                     label="Teléfono"
                   />
                   <div>
-                    <label className="block text-gray-700 text-sm font-bold mb-2">Dirección</label>
+                    <label className="block text-gray-700 dark:text-white text-sm font-bold mb-2">Dirección</label>
                     <button
                       type="button"
                       onClick={() => setShowModal(true)}
-                      className="w-full px-3 py-2 border rounded-md shadow-sm text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="bg-white text-black w-full px-3 py-2 border rounded-md shadow-sm text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-300"
                     >
                       {address || "Selecciona tu dirección"}
                     </button>
@@ -240,11 +273,11 @@ const AuthForm: React.FC = () => {
             label="Contraseña"
             type="password"
           />
-          
+
           <Boton fullWidth type="submit">
             {variant === 'LOGIN' ? 'Iniciar Sesión' : 'Registrarse'}
           </Boton>
-          <div className="flex justifycenter">
+          <div className="flex justify-center">
             <div onClick={() => setVariant(variant === 'LOGIN' ? 'REGISTER' : variant === 'REGISTER' ? 'REGISTERALQUILANTE' : 'LOGIN')} className="cursor-pointer text-sm text-cyan-500 hover:text-cyan-300">
               {variant === 'LOGIN' ? '¿No tienes una cuenta? Regístrate' : variant === 'REGISTER' ? '¿Quieres ser alquilante? Regístrate aquí' : '¿Ya tienes una cuenta? Iniciar Sesión'}
             </div>
@@ -254,7 +287,7 @@ const AuthForm: React.FC = () => {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-gray-300 dark:border-gray-600" />
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="bg-white dark:bg-sky-950 px-2 text-black dark:text-white">Iniciar sesión con</span>
@@ -270,14 +303,9 @@ const AuthForm: React.FC = () => {
             </div>
           </div>
         )}
-        <button
-          onClick={toggleDarkMode}
-          className="mt-6 w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 py-2 rounded-lg shadow-md"
-        >
-          {isDarkMode ? 'Modo Claro' : 'Modo Oscuro'}
-        </button>
       </div>
-      <MapaModal show={showModal} onClose={() => setShowModal(false)} onSave={handleAddressSave} />
+      <MapaModal show={showModal} onClose={() => setShowModal(false)} />
+      <Toaster toastOptions={{ duration: 3000, position: 'top-left' }} />
     </div>
   );
 };

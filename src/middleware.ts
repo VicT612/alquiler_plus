@@ -1,21 +1,34 @@
-// src/middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getToken } from 'next-auth/jwt';
+import { parse } from 'cookie';
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  const cookieHeader = request.headers.get('cookie');
+  const cookies = cookieHeader ? parse(cookieHeader) : {};
+  const role = cookies.rol as string;
 
-  const protectedRoutes = ['/InicioUsuario', '/InicioPropietario', '/InicioAdmin', '/InicioBaneado'];
+  const protectedRoutes = {
+    USUARIO: '/InicioUsuario',
+    PROPIETARIO: '/InicioPropietario',
+    ADMIN: '/InicioAdmin',
+    BANEADO: '/InicioBaneado',
+  };
 
-  if (protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
-    if (!token) {
-      return NextResponse.redirect(new URL('/', request.url));
-    }
+  const userRoles: (keyof typeof protectedRoutes)[] = ['USUARIO', 'PROPIETARIO', 'ADMIN', 'BANEADO'];
+
+  if (!role || !userRoles.includes(role as keyof typeof protectedRoutes)) {
+    return NextResponse.redirect(new URL('/', request.url));
   }
-  return NextResponse.next();
+
+  const userRoute = protectedRoutes[role as keyof typeof protectedRoutes];
+
+  if (request.nextUrl.pathname.startsWith(userRoute)) {
+    return NextResponse.next();
+  } else {
+    return NextResponse.redirect(new URL(userRoute, request.url));
+  }
 }
 
 export const config = {
-  matcher: ['/InicioUsuario/:path*', '/InicioPropietario/:path*', '/InicioAdmin/:path*', '/InicioBaneado/:path*']
+  matcher: ['/InicioUsuario/:path*', '/InicioPropietario/:path*', '/InicioAdmin/:path*', '/InicioBaneado/:path*'],
 };
