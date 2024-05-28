@@ -1,6 +1,11 @@
 const BaneadoPage = () => {
     return (
-        <h1 className="text-3xl font-bold text-center">A donde???</h1>
+       <div>
+        <article className="text-pretty ...">
+            <h3>Beloved Manhattan soup stand closes</h3>
+            <p>New Yorkers are facing the winter chill...</p>
+        </article>
+       </div> 
     );
   };
   

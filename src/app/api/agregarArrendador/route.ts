@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, nombre, apellido, contrasena, telefono, fotoUrl, fechaNacimiento, ci, ubicacionId } = body;
+    const { email, nombre, apellido, direccion,ciudad , contrasena, telefono, fotoUrl, fechaNacimiento, ci, ubicacionId, } = body;
 
     const existingUserByEmail = await db.usuario.findUnique({ where: { email } });
     if (existingUserByEmail) {
@@ -24,6 +24,8 @@ export async function POST(request: Request) {
         email,
         nombre,
         apellido,
+        direccion,
+        ciudad,
         contrasena: hashedPassword,
         telefono,
         fotoUrl,

@@ -100,7 +100,7 @@ const AuthForm: React.FC = () => {
         event.preventDefault();
       }
       setIsLoading(true);
-  
+
       let response;
       if (variant === 'LOGIN') {
         response = await axios.post('/api/inicio', { email: data.email, contrasena: data.contrasena });
@@ -109,7 +109,7 @@ const AuthForm: React.FC = () => {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
         Cookies.set('rol', user.rol);
-  
+
         switch (rol) {
           case 'USUARIO':
             router.push('/InicioUsuario');
@@ -128,11 +128,6 @@ const AuthForm: React.FC = () => {
             break;
         }
       } else if (variant === 'REGISTERALQUILANTE') {
-        if (!ubicacionId) {
-          toast.error('Debe seleccionar una dirección');
-          return;
-        }
-  
         const storedAddress = localStorage.getItem('Mapeado');
         if (storedAddress) {
           const addressData = JSON.parse(storedAddress);
@@ -140,19 +135,20 @@ const AuthForm: React.FC = () => {
           const addressResponse = await axios.post('/api/agregarDireccion', {
             latitud,
             longitud,
-            calle,
-            barrio,
-            ciudad,
+            calle: calle as string,
+            barrio: barrio as string,
+            ciudad: ciudad as string,
             provincia,
             Departamento,
             pais,
             beneficios,
           });
-  
+
           const ubicacionId = addressResponse.data.id;
-  
+
           const propietarioResponse = await axios.post('/api/agregarArrendador', {
             ...data,
+            
             fotoUrl,
             ubicacionId,
           });
@@ -170,8 +166,6 @@ const AuthForm: React.FC = () => {
       setIsLoading(false);
     }
   };
-  
-
 
   return (
     <div className="flex justify-center items-center min-h-screen relative">
