@@ -3,7 +3,7 @@ import React from 'react';
 interface InputProps {
   id: string;
   label?: string;
-  type?: 'text' | 'email' | 'password' | 'file' | 'date';
+  type?: 'string' | 'email' | 'password' | 'file' | 'date' ;
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
@@ -16,7 +16,7 @@ interface InputProps {
 const Entrada: React.FC<InputProps> = ({
   id,
   label,
-  type = 'text',
+  type = 'string',
   placeholder,
   required = false,
   disabled = false,

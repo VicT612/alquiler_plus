@@ -17,7 +17,7 @@ export async function middleware(request: NextRequest) {
   const userRoles: (keyof typeof protectedRoutes)[] = ['USUARIO', 'PROPIETARIO', 'ADMIN', 'BANEADO'];
 
   if (!role || !userRoles.includes(role as keyof typeof protectedRoutes)) {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL('/Adonde', request.url));
   }
 
   const userRoute = protectedRoutes[role as keyof typeof protectedRoutes];

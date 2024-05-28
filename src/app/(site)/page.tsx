@@ -38,7 +38,19 @@ const AuthForm: React.FC = () => {
 
   const handleSignIn = async (provider: 'google' | 'azure-ad') => {
     setIsLoading(true);
-    signIn(provider);
+    const result = await signIn(provider, { redirect: false });
+    if (result && result.url) {
+      const user = await axios.get(result.url);
+      if (provider === 'google') {
+        setValue('nombre', user.data.name);
+        setValue('email', user.data.email);
+        setFotoUrl(user.data.image);
+      } else if (provider === 'azure-ad') {
+        setValue('nombre', user.data.name);
+        setValue('email', user.data.email);
+      }
+    }
+    setIsLoading(false);
   };
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<FieldValues>({
@@ -148,7 +160,6 @@ const AuthForm: React.FC = () => {
 
           const propietarioResponse = await axios.post('/api/agregarArrendador', {
             ...data,
-            
             fotoUrl,
             ubicacionId,
           });
@@ -277,14 +288,14 @@ const AuthForm: React.FC = () => {
             </div>
           </div>
         </form>
-        {variant === 'LOGIN' && (
+        {variant !== 'LOGIN' && (
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300 dark:border-gray-600" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-white dark:bg-sky-950 px-2 text-black dark:text-white">Iniciar sesión con</span>
+                <span className="bg-white dark:bg-sky-950 px-2 text-black dark:text-white">Regístrate con</span>
               </div>
             </div>
             <div className="mt-6 grid grid-cols-2 gap-3">
