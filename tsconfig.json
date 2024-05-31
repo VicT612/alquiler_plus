@@ -26,3 +26,4 @@
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/InicioPropietario/components/UbicacionModal.jsx", "src/app/InicioPropietario/components/UbicacionModal.jsx"],
   "exclude": ["node_modules"]
 }
+
