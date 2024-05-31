@@ -11,6 +11,7 @@
   "dependencies": {
     "@hookform/resolvers": "^3.4.2",
     "@prisma/client": "^5.14.0",
+    "autoprefixer": "^10.4.19",
     "axios": "^1.6.8",
     "bcryptjs": "^2.4.3",
     "cookie": "^0.6.0",
@@ -19,11 +20,13 @@
     "leaflet": "^1.9.4",
     "next": "14.2.3",
     "next-auth": "^4.24.7",
+    "postcss": "^8.4.38",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.51.4",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^5.2.1",
+    "tailwindcss": "^3.4.3",
     "three": "^0.164.1",
     "yup": "^1.4.0"
   },
@@ -39,9 +42,7 @@
     "@types/three": "^0.164.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
-    "postcss": "^8",
     "prisma": "^5.14.0",
-    "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
 }

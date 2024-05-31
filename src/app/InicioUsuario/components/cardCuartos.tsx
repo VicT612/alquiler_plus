@@ -13,9 +13,9 @@ const Card: React.FC<CardProps> = ({ cuartos }) => {
       {cuartos.map((cuarto) => (
         <div key={cuarto.id} className="bg-white p-4 rounded-lg shadow-md">
           <img src={cuarto.fotoUrlcuarto} alt={`Imagen de ${cuarto.tipo}`} className="w-full h-48 object-cover rounded-lg" />
-          <h3 className="text-xl font-bold mt-2">{cuarto.tipo} - {cuarto.direccion}</h3>
+          <h3 className="text-xl text-black font-bold mt-2">{cuarto.tipo} - {cuarto.direccion}</h3>
           <p>{cuarto.caracteristicas}</p>
-          <p className="text-lg font-semibold">{cuarto.precio} USD</p>
+          <p className="text-lg text-black font-semibold">{cuarto.precio} Bs.</p>
         </div>
       ))}
     </div>
