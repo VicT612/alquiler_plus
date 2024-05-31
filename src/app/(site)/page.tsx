@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
-import { useSession, signIn } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import axios from 'axios';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import Entrada from './componentes/Entradas';
@@ -21,6 +21,7 @@ const AuthForm: React.FC = () => {
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [address, setAddress] = useState<string>('');
+  const [city, setCity] = useState<string>('');
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const [ubicacionId, setUbicacionId] = useState<string | null>(null);
   const router = useRouter();
@@ -67,6 +68,15 @@ const AuthForm: React.FC = () => {
     },
   });
 
+  const inputFields: Array<{ id: string; label: string; type: 'text' | 'email' | 'password' | 'file' | 'date' }> = [
+    { id: 'nombre', label: 'Nombre', type: 'text' },
+    { id: 'apellido', label: 'Apellido', type: 'text' },
+    { id: 'telefono', label: 'Teléfono', type: 'text' },
+    { id: 'fechaNacimiento', label: 'Fecha de Nacimiento', type: 'date' },
+    { id: 'ci', label: 'Carnet de Identidad', type: 'text' }
+  ];
+
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0 && (variant === 'REGISTER' || variant === 'REGISTERALQUILANTE')) {
@@ -80,6 +90,8 @@ const AuthForm: React.FC = () => {
     }
   };
 
+
+
   useEffect(() => {
     if (variant === 'REGISTERALQUILANTE') {
       const storedAddress = localStorage.getItem('Mapeado');
@@ -87,6 +99,7 @@ const AuthForm: React.FC = () => {
         const addressData = JSON.parse(storedAddress);
         const calle = addressData.calle || addressData.barrio;
         setAddress(calle as string);
+        setCity(addressData.ciudad as string);
         setValue('direccion', calle as string);
         setValue('ciudad', addressData.ciudad as string);
       }
@@ -100,6 +113,7 @@ const AuthForm: React.FC = () => {
         const addressData = JSON.parse(storedAddress);
         const calle = addressData.calle || addressData.barrio;
         setAddress(calle as string);
+        setCity(addressData.ciudad as string);
         setValue('direccion', calle as string);
         setValue('ciudad', addressData.ciudad as string);
       }
@@ -195,32 +209,20 @@ const AuthForm: React.FC = () => {
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {variant !== 'LOGIN' && (
             <>
-              <Entrada
-                disabled={false}
-                register={register}
-                errors={errors}
-                required
-                id="nombre"
-                label="Nombre"
-              />
-              <Entrada
-                disabled={false}
-                register={register}
-                errors={errors}
-                required
-                id="apellido"
-                label="Apellido"
-              />
+              {inputFields.slice(0, variant === 'REGISTERALQUILANTE' ? 5 : 2).map((field) => (
+                <Entrada
+                  key={field.id}
+                  disabled={false}
+                  register={register}
+                  errors={errors}
+                  required
+                  id={field.id}
+                  label={field.label}
+                  type={field.type}
+                />
+              ))}
               {variant === 'REGISTERALQUILANTE' && (
                 <>
-                  <Entrada
-                    disabled={false}
-                    register={register}
-                    errors={errors}
-                    required
-                    id="telefono"
-                    label="Teléfono"
-                  />
                   <div>
                     <label className="block text-gray-700 dark:text-white text-sm font-bold mb-2">Dirección</label>
                     <button
@@ -231,31 +233,15 @@ const AuthForm: React.FC = () => {
                       {address || "Selecciona tu dirección"}
                     </button>
                   </div>
-                  <Entrada
-                    disabled={false}
-                    register={register}
-                    errors={errors}
-                    required
-                    id="ciudad"
-                    label="Ciudad"
-                  />
-                  <Entrada
-                    disabled={false}
-                    register={register}
-                    errors={errors}
-                    required
-                    id="fechaNacimiento"
-                    label="Fecha de Nacimiento"
-                    type="date"
-                  />
-                  <Entrada
-                    disabled={false}
-                    register={register}
-                    errors={errors}
-                    required
-                    id="ci"
-                    label="Carnet de Identidad"
-                  />
+                  <div>
+                    <label className="block text-gray-700 dark:text-white text-sm font-bold mb-2">Ciudad</label>
+                    <input
+                      type="text"
+                      value={city}
+                      disabled
+                      className="bg-white text-black w-full px-3 py-2 border rounded-md shadow-sm text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-300"
+                    />
+                  </div>
                 </>
               )}
             </>

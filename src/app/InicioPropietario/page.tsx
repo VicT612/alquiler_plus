@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
+import MapaModal from "../(site)/componentes/MapaModal";
 
 const DynamicMapa = dynamic(() => import("../InicioPropietario/components/UbicacionModal"), {
   loading: () => <div>Cargando...</div>,
@@ -45,10 +46,21 @@ const AboutRoom = () => {
     condiciones: '',
     tipoCuarto: 'GARZONIER',
     estadoCuarto: 'DESOCUPADO',
-    email: session?.user?.email
+    email: '', // Inicialmente vacío
+    direccion: '' // Asegúrate de incluir este campo
   });
 
-  const [fotoUrlcuarto, setFotoUrl] = useState<string>('');
+  const [fotoUrlcuarto, setFotoUrlcuarto] = useState<string>(''); // Declaración correcta de fotoUrlcuarto
+  const [showMapModal, setShowMapModal] = useState(false); // Declaración correcta de showMapModal
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        email: session.user?.email ?? ''
+      }));
+    }
+  }, [session]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -64,26 +76,59 @@ const AboutRoom = () => {
       const file = files[0];
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFotoUrl(reader.result as string);
+        setFotoUrlcuarto(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      await axios.post('/api/cuartos', {
-        ...formData,
-        fotoUrlcuarto: fotoUrlcuarto
-      });
-      setFotoUrl(''); // Limpiar la URL de la imagen después de enviar el formulario
-    } catch (error) {
-      console.error('Error al agregar cuarto:', error);
-      // Aquí podrías manejar el error de alguna manera, como mostrar un mensaje de error al usuario
-    }
+  const handleOpenMapModal = () => {
+    setShowMapModal(true);
   };
 
+  const handleCloseMapModal = () => {
+    setShowMapModal(false);
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const storedAddress = localStorage.getItem('Mapeado');
+    if (storedAddress) {
+      const addressData = JSON.parse(storedAddress);
+      const { latitud, longitud, calle, barrio, ciudad, provincia, Departamento, pais, beneficios } = addressData;
+  
+      try {
+        const addressResponse = await axios.post('/api/agregarDireccion', {
+          latitud,
+          longitud,
+          calle,
+          barrio,
+          ciudad,
+          provincia,
+          Departamento,
+          pais,
+          beneficios,
+        });
+  
+        const ubicacionId = addressResponse.data.id;
+  
+        await axios.post('/api/cuartos', {
+          ...formData,
+          precio: parseFloat(formData.precio), // Conversión a número
+          fotoUrlcuarto,
+          ubicacionId,
+          direccion: `${calle}` as string
+        });
+  
+        setFotoUrlcuarto(''); // Limpiar la URL de la imagen después de enviar el formulario
+      } catch (error) {
+        console.error('Error al agregar cuarto:', error);
+      }
+    } else {
+      console.log('No se ha seleccionado ninguna ubicación.');
+    }
+  };
+  
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (userData) {
@@ -124,13 +169,15 @@ const AboutRoom = () => {
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
       <div className="h-full p-3 space-y-2 w-60 bg-white dark:bg-gray-800">
-        {user && (
+      {user && (
           <div className="flex items-center p-2 space-x-4">
-            <img src={user.fotoUrl || "https://static.vecteezy.com/system/resources/previews/000/550/731/original/user-icon-vector.jpg"} alt="" className="w-12 h-12 rounded-full dark:bg-gray-500" />
+            <img
+              src={user.fotoUrl || 'https://static.vecteezy.com/system/resources/previews/000/550/731/original/user-icon-vector.jpg'}
+              alt=""
+              className="w-12 h-12 rounded-full dark:bg-gray-500"
+            />
             <div>
               <h2 className="text-lg font-bold">{user.nombre}</h2>
-            </div>
-            <div>
               <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-600">{user.rol}</h3>
             </div>
           </div>
@@ -202,9 +249,11 @@ const AboutRoom = () => {
                   name="tipoCuarto"
                   value={formData.tipoCuarto}
                   onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
+                  className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 text-black"
                 >
                   <option value="GARZONIER">Garzonier</option>
+                  <option value="RECIDENCIA ESTUDINATIL">Recidencia Estundiantil</option>
+                  <option value="CUARTO DE ALQUILER">Cuarto de Alquiler</option>
                 </select>
               </div>
               <div className="mb-4">
@@ -229,11 +278,12 @@ const AboutRoom = () => {
                   name="foto"
                   accept="image/*"
                   onChange={handleFileChange}
-                  className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 text-black"
+                  className="block w-full text-lg text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                 />
               </div>
             </div>
-            <button type="submit" className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">Agregar Cuarto</button>
+            <button type="button" onClick={handleOpenMapModal} className="bg-green-500 text-white font-semibold py-2 px-4 rounded hover:bg-green-600">Agregar Ubicación</button>
+            <button type="submit" className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 ml-4">Agregar Cuarto</button>
           </form>
         </div>
 
@@ -253,6 +303,9 @@ const AboutRoom = () => {
           ))}
         </div>
       </div>
+
+      {/* Modal del mapa */}
+      <MapaModal show={showMapModal} onClose={handleCloseMapModal} />
     </div>
   );
 };

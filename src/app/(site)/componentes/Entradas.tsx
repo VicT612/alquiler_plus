@@ -3,7 +3,7 @@ import React from 'react';
 interface InputProps {
   id: string;
   label?: string;
-  type?: 'string' | 'email' | 'password' | 'file' | 'date' ;
+  type?: 'text' | 'string' | 'email' | 'password' | 'file' | 'date';
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
@@ -16,7 +16,7 @@ interface InputProps {
 const Entrada: React.FC<InputProps> = ({
   id,
   label,
-  type = 'string',
+  type = 'text',
   placeholder,
   required = false,
   disabled = false,
@@ -43,14 +43,12 @@ const Entrada: React.FC<InputProps> = ({
           onChange={onChange}
           value={value}
           className={`text-black shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full h-full p-2 sm:text-sm border-gray-300 rounded-md ${
-            errors && errors[id] ? 'border-red-500' : '' 
+            errors && errors[id] ? 'border-red-500' : ''
           }`}
         />
       </div>
       {errors && errors[id] && (
         <p className="mt-2 text-sm text-red-600" id={`${id}-error`}>
-
-
           {errors[id].message}
         </p>
       )}

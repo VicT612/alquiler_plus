@@ -99,20 +99,19 @@ const MapaModal = ({ show, onClose }) => {
       <div className="relative w-auto max-w-3xl mx-auto my-6">
         <div className="bg-white rounded-lg shadow-lg">
           <div className="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t">
-            <h3 className="text-2xl font-semibold">Selecciona tu ubicación</h3>
+            <h3 className="text-black text-2xl font-semibold">Selecciona tu ubicación</h3>
             <button
-              className="p-1 ml-auto bg-transparent border-0 text-black float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+              className="p-1 ml-auto bg-transparent border-none text-black float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
               onClick={onClose}
             >
-              <span className="bg-transparent text-black h-6 w-6 text-2xl block outline-none focus:outline-none">×</span>
             </button>
           </div>
           <div className="relative p-6 flex-auto">
             <div id="map" key={mapKey} style={{ height: '400px' }}></div>
           </div>
-          <div className="flex items-center justify-end p-6 border-t border-solid border-gray-300 rounded-b">
+          <div className="flex items-center justify-end p-4 border-t border-solid border-gray-300 rounded-b">
             <button
-              className="px-6 py-2 text-sm font-bold text-red-500 uppercase outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+              className="px-4 py-2 text-sm font-bold text-red-500 uppercase outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
               type="button"
               onClick={onClose}
             >

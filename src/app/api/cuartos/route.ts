@@ -16,6 +16,10 @@ export async function POST(request: Request) {
       email
     } = body;
 
+    if (!email) {
+      return NextResponse.json({ message: 'Email no proporcionado' }, { status: 400 });
+    }
+
     const usuario = await db.usuario.findUnique({
       where: {
         email: email
