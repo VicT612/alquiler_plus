@@ -2,15 +2,9 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import Sidebar from './components/sideBar';
 import Card from './components/cardCuartos';
 import { User, Cuarto } from './components/types';
-
-const DynamicMapa = dynamic(() => import('../InicioPropietario/components/UbicacionModal'), {
-  loading: () => <div>Cargando...</div>,
-  ssr: false,
-});
 
 const AboutRoom = () => {
   const [cuartos, setCuartos] = useState<Cuarto[]>([]);
