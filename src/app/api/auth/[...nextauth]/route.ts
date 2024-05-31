@@ -5,6 +5,9 @@ import MicrosoftProvider from "next-auth/providers/azure-ad";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "@/lib/db";
 import bcrypt from 'bcryptjs';
+import { JWT } from "next-auth/jwt";
+import { Session, User, Account, Profile } from "next-auth";
+import { AdapterUser } from "next-auth/adapters";
 
 interface CustomUser {
   id: string;
@@ -13,7 +16,7 @@ interface CustomUser {
   role: string;
 }
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -72,14 +75,14 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account, profile, isNewUser }: { token: JWT, user?: User | AdapterUser, account?: Account | null, profile?: Profile, isNewUser?: boolean }) {
       if (user) {
         token.id = (user as CustomUser).id;
         token.role = (user as CustomUser).role;
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: Session, token: JWT }) {
       (session.user as CustomUser).id = token.id as string;
       (session.user as CustomUser).role = token.role as string;
       return session;
