@@ -6,11 +6,6 @@ import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import MapaModal from "../(site)/componentes/MapaModal";
 
-const DynamicMapa = dynamic(() => import("../InicioPropietario/components/UbicacionModal"), {
-  loading: () => <div>Cargando...</div>,
-  ssr: false,
-});
-
 interface User {
   id: number;
   nombre: string;
