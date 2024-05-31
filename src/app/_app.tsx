@@ -1,7 +1,7 @@
 "use client";
 
 import { SessionProvider} from "next-auth/react";
-import 'tailwindcss/tailwind.css';
+import '../app/globals.css'
 export interface AuthContextProps {
   children: React.ReactNode;
 }
