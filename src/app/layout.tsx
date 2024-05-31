@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Script from "next/script";
 import AuthContext from "./_app";
-import 'tailwindcss/tailwind.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
