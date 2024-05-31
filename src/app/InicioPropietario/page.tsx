@@ -92,40 +92,42 @@ const AboutRoom = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const storedAddress = localStorage.getItem('Mapeado');
-    if (storedAddress) {
-      const addressData = JSON.parse(storedAddress);
-      const { latitud, longitud, calle, barrio, ciudad, provincia, Departamento, pais, beneficios } = addressData;
-  
-      try {
-        const addressResponse = await axios.post('/api/agregarDireccion', {
-          latitud,
-          longitud,
-          calle,
-          barrio,
-          ciudad,
-          provincia,
-          Departamento,
-          pais,
-          beneficios,
-        });
-  
-        const ubicacionId = addressResponse.data.id;
-  
-        await axios.post('/api/cuartos', {
-          ...formData,
-          precio: parseFloat(formData.precio), // Conversión a número
-          fotoUrlcuarto,
-          ubicacionId,
-          direccion: `${calle}` as string
-        });
-  
-        setFotoUrlcuarto(''); // Limpiar la URL de la imagen después de enviar el formulario
-      } catch (error) {
-        console.error('Error al agregar cuarto:', error);
+    if (typeof window !== 'undefined') {
+      const storedAddress = localStorage.getItem('Mapeado');
+      if (storedAddress) {
+        const addressData = JSON.parse(storedAddress);
+        const { latitud, longitud, calle, barrio, ciudad, provincia, Departamento, pais, beneficios } = addressData;
+    
+        try {
+          const addressResponse = await axios.post('/api/agregarDireccion', {
+            latitud,
+            longitud,
+            calle,
+            barrio,
+            ciudad,
+            provincia,
+            Departamento,
+            pais,
+            beneficios,
+          });
+    
+          const ubicacionId = addressResponse.data.id;
+    
+          await axios.post('/api/cuartos', {
+            ...formData,
+            precio: parseFloat(formData.precio), // Conversión a número
+            fotoUrlcuarto,
+            ubicacionId,
+            direccion: `${calle}` as string
+          });
+    
+          setFotoUrlcuarto(''); // Limpiar la URL de la imagen después de enviar el formulario
+        } catch (error) {
+          console.error('Error al agregar cuarto:', error);
+        }
+      } else {
+        console.log('No se ha seleccionado ninguna ubicación.');
       }
-    } else {
-      console.log('No se ha seleccionado ninguna ubicación.');
     }
   };
   
@@ -158,11 +160,13 @@ const AboutRoom = () => {
   };
 
   useEffect(() => {
-    const body = document.body;
-    if (darkMode) {
-      body.classList.add('dark');
-    } else {
-      body.classList.remove('dark');
+    if (typeof window !== 'undefined') {
+      const body = document.body;
+      if (darkMode) {
+        body.classList.add('dark');
+      } else {
+        body.classList.remove('dark');
+      }
     }
   }, [darkMode]);
 
