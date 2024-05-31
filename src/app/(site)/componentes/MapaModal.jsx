@@ -1,9 +1,11 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import L from 'leaflet';
+import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import 'tailwindcss/tailwind.css';
 import axios from 'axios';
+
+const DynamicMap = dynamic(() => import('leaflet'), { ssr: false });
 
 const MapaModal = ({ show, onClose }) => {
   const [map, setMap] = useState(null);
@@ -18,40 +20,44 @@ const MapaModal = ({ show, onClose }) => {
   }, [show]);
 
   useEffect(() => {
-    if (show && typeof window !== 'undefined') {
-      const newMap = L.map('map').setView([51.503, -0.09], 19);
-      setMap(newMap);
+    if (show && typeof window !== 'undefined' && mapKey !== 0) {
+      const L = require('leaflet');
 
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      }).addTo(newMap);
+      if (!map) {
+        const newMap = L.map('map').setView([51.503, -0.09], 19);
+        setMap(newMap);
 
-      const markerIcon = L.icon({
-        iconUrl: './marker.webp',
-        iconSize: [30, 30],
-        iconAnchor: [15, 30],
-        popupAnchor: [0, -30],
-      });
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        }).addTo(newMap);
 
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          const { latitude, longitude } = position.coords;
-          const userLatLng = L.latLng(latitude, longitude);
-          newMap.setView(userLatLng, 19);
-          setSelectedPosition(userLatLng);
-          const marker = L.marker(userLatLng, { icon: markerIcon, draggable: true }).addTo(newMap);
-          setUserMarker(marker);
-
-          marker.on('dragend', function (event) {
-            const marker = event.target;
-            const position = marker.getLatLng();
-            setSelectedPosition(position);
-          });
+        const markerIcon = L.icon({
+          iconUrl: './marker.webp',
+          iconSize: [30, 30],
+          iconAnchor: [15, 30],
+          popupAnchor: [0, -30],
         });
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+            const { latitude, longitude } = position.coords;
+            const userLatLng = L.latLng(latitude, longitude);
+            newMap.setView(userLatLng, 19);
+            setSelectedPosition(userLatLng);
+            const marker = L.marker(userLatLng, { icon: markerIcon, draggable: true }).addTo(newMap);
+            setUserMarker(marker);
+
+            marker.on('dragend', function (event) {
+              const marker = event.target;
+              const position = marker.getLatLng();
+              setSelectedPosition(position);
+            });
+          });
+        }
       }
     }
-  }, [show, mapKey]);
+  }, [show, mapKey, map]);
 
   const handleSave = async () => {
     if (selectedPosition) {
