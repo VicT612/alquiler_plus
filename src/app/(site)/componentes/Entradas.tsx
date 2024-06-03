@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import './Entradas.css';
 
 interface InputProps {
   id: string;
@@ -25,30 +27,39 @@ const Entrada: React.FC<InputProps> = ({
   onChange,
   value,
 }) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <div className="mb-4">
+    <div className="input-container">
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium dark:text-white text-black">
+        <label htmlFor={id} className="input-label">
           {label}
         </label>
       )}
-      <div className="mt-1">
+      <div className="input-wrapper">
         <input
           {...register(id)}
           id={id}
-          type={type}
+          type={showPassword && type === 'password' ? 'text' : type}
           required={required}
           disabled={disabled}
           placeholder={placeholder}
           onChange={onChange}
           value={value}
-          className={`text-black shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full h-full p-2 sm:text-sm border-gray-300 rounded-md ${
-            errors && errors[id] ? 'border-red-500' : ''
-          }`}
+          className={`input-field ${errors && errors[id] ? 'input-error' : ''}`}
         />
+        {type === 'password' && (
+          <span onClick={handleTogglePassword} className="password-toggle-icon">
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
+        )}
       </div>
       {errors && errors[id] && (
-        <p className="mt-2 text-sm text-red-600" id={`${id}-error`}>
+        <p className="input-error-message" id={`${id}-error`}>
           {errors[id].message}
         </p>
       )}

@@ -3,11 +3,11 @@ import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
-import './MapaModal.css';
+import './MapaModalCuarto.css';
 
 const DynamicMap = dynamic(() => import('leaflet'), { ssr: false });
 
-const MapaModal = ({ show, onClose }) => {
+const MapaModalCuarto = ({ show, onClose }) => {
   const [map, setMap] = useState(null);
   const [userMarker, setUserMarker] = useState(null);
   const [selectedPosition, setSelectedPosition] = useState(null);
@@ -33,7 +33,7 @@ const MapaModal = ({ show, onClose }) => {
         }).addTo(newMap);
 
         const markerIcon = L.icon({
-          iconUrl: './marker.webp',
+          iconUrl: '../marker.webp',
           iconSize: [30, 30],
           iconAnchor: [15, 30],
           popupAnchor: [0, -30],
@@ -80,7 +80,7 @@ const MapaModal = ({ show, onClose }) => {
         };
 
         console.log('Datos que se enviarán al servidor:', mapeado);
-        localStorage.setItem('Mapeado', JSON.stringify(mapeado));
+        localStorage.setItem('MapeadoCuartos', JSON.stringify(mapeado));
 
         const res = await axios.post('/api/agregarDireccion', mapeado, {
           headers: {
@@ -125,4 +125,4 @@ const MapaModal = ({ show, onClose }) => {
   );
 };
 
-export default MapaModal;
+export default MapaModalCuarto;

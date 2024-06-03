@@ -11,6 +11,7 @@ import MicrosoftButton from './componentes/MicrosoftBoton';
 import { Toaster, toast } from 'react-hot-toast';
 import MapaModal from './componentes/MapaModal';
 import Cookies from 'js-cookie';
+import './page.css'; 
 
 type Variant = 'LOGIN' | 'REGISTER' | 'REGISTERALQUILANTE';
 
@@ -76,7 +77,6 @@ const AuthForm: React.FC = () => {
     { id: 'ci', label: 'Carnet de Identidad', type: 'text' }
   ];
 
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0 && (variant === 'REGISTER' || variant === 'REGISTERALQUILANTE')) {
@@ -89,8 +89,6 @@ const AuthForm: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
-
-
 
   useEffect(() => {
     if (variant === 'REGISTERALQUILANTE') {
@@ -138,13 +136,13 @@ const AuthForm: React.FC = () => {
 
         switch (rol) {
           case 'USUARIO':
-            router.push('/InicioUsuario');
+            router.push('/VistaGeneral/InicioUsuario');
             break;
           case 'PROPIETARIO':
-            router.push('/InicioPropietario');
+            router.push('/VistaGeneral/InicioPropietario');
             break;
           case 'ADMIN':
-            router.push('/InicioAdmin');
+            router.push('/VistaGeneral/InicioAdmin');
             break;
           case 'BANEADO':
             router.push('/InicioBaneado');
@@ -192,21 +190,53 @@ const AuthForm: React.FC = () => {
     }
   };
 
+  const renderSwitchLinks = () => {
+    switch (variant) {
+      case 'LOGIN':
+        return (
+          <>
+            <div onClick={() => setVariant('REGISTER')} className="auth-form-link">
+              ¿No tienes una cuenta? Regístrate
+            </div>
+            <div onClick={() => setVariant('REGISTERALQUILANTE')} className="auth-form-link">
+              ¿Quieres ser alquilante? Regístrate aquí
+            </div>
+          </>
+        );
+      case 'REGISTER':
+        return (
+          <>
+            <div onClick={() => setVariant('LOGIN')} className="auth-form-link">
+              ¿Ya tienes una cuenta? Iniciar Sesión
+            </div>
+          </>
+        );
+      case 'REGISTERALQUILANTE':
+        return (
+          <>
+            <div onClick={() => setVariant('LOGIN')} className="auth-form-link">
+              ¿Ya tienes una cuenta? Iniciar Sesión
+            </div>
+          </>
+        );
+    }
+  };
+
   return (
-    <div className="flex justify-center items-center min-h-screen relative">
-      <div className="bg-white dark:bg-sky-950 bg-opacity-80 p-6 rounded-lg shadow-lg z-10 max-w-md w-full space-y-6">
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">
+    <div className="auth-form-container">
+      <div className="auth-form">
+        <h2 className="auth-form-title">
           {variant === 'LOGIN' ? 'Inicia Sesión' : 'Regístrate'}
         </h2>
         {variant !== 'LOGIN' && showPhotoUpload && (
-          <div className="flex justify-center mb-4">
-            <label htmlFor="upload-photo" className="cursor-pointer">
+          <div className="photo-upload">
+            <label htmlFor="upload-photo" className="upload-label">
               <img src='./upload_icon.png' alt="Subir foto" />
               <input id="upload-photo" type="file" className="hidden" onChange={handleFileChange} />
             </label>
           </div>
         )}
-        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <form className="auth-form-content" onSubmit={handleSubmit(onSubmit)}>
           {variant !== 'LOGIN' && (
             <>
               {inputFields.slice(0, variant === 'REGISTERALQUILANTE' ? 5 : 2).map((field) => (
@@ -224,22 +254,22 @@ const AuthForm: React.FC = () => {
               {variant === 'REGISTERALQUILANTE' && (
                 <>
                   <div>
-                    <label className="block text-gray-700 dark:text-white text-sm font-bold mb-2">Dirección</label>
+                    <label className="auth-form-label">Dirección</label>
                     <button
                       type="button"
                       onClick={() => setShowModal(true)}
-                      className="bg-white text-black w-full px-3 py-2 border rounded-md shadow-sm text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-300"
+                      className="auth-form-button"
                     >
                       {address || "Selecciona tu dirección"}
                     </button>
                   </div>
                   <div>
-                    <label className="block text-gray-700 dark:text-white text-sm font-bold mb-2">Ciudad</label>
+                    <label className="auth-form-label">Ciudad</label>
                     <input
                       type="text"
                       value={city}
                       disabled
-                      className="bg-white text-black w-full px-3 py-2 border rounded-md shadow-sm text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-300"
+                      className="auth-form-input"
                     />
                   </div>
                 </>
@@ -268,23 +298,21 @@ const AuthForm: React.FC = () => {
           <Boton fullWidth type="submit">
             {variant === 'LOGIN' ? 'Iniciar Sesión' : 'Registrarse'}
           </Boton>
-          <div className="flex justify-center">
-            <div onClick={() => setVariant(variant === 'LOGIN' ? 'REGISTER' : variant === 'REGISTER' ? 'REGISTERALQUILANTE' : 'LOGIN')} className="cursor-pointer text-sm text-cyan-500 hover:text-cyan-300">
-              {variant === 'LOGIN' ? '¿No tienes una cuenta? Regístrate' : variant === 'REGISTER' ? '¿Quieres ser alquilante? Regístrate aquí' : '¿Ya tienes una cuenta? Iniciar Sesión'}
-            </div>
+          <div className="auth-form-switch">
+            {renderSwitchLinks()}
           </div>
         </form>
         {variant !== 'LOGIN' && (
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+          <div className="auth-form-divider">
+            <div className="">
+              <div className="">
+                <div className="" />
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="bg-white dark:bg-sky-950 px-2 text-black dark:text-white">Regístrate con</span>
+              <div className="">
+                <span className="auth-form-divider-text">Regístrate con</span>
               </div>
             </div>
-            <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="auth-form-buttons">
               <div>
                 <GoogleButton onClick={() => handleSignIn('google')} />
               </div>
@@ -302,3 +330,4 @@ const AuthForm: React.FC = () => {
 };
 
 export default AuthForm;
+

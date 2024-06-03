@@ -8,9 +8,9 @@ export async function middleware(request: NextRequest) {
   const role = cookies.rol as string;
 
   const protectedRoutes = {
-    USUARIO: '/InicioUsuario',
-    PROPIETARIO: '/InicioPropietario',
-    ADMIN: '/InicioAdmin',
+    USUARIO: '/VistaGeneral/InicioUsuario',
+    PROPIETARIO: '/VistaGeneral/InicioPropietario',
+    ADMIN: '/VistaGeneral/InicioAdmin',
     BANEADO: '/InicioBaneado',
   };
 
@@ -30,5 +30,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/InicioUsuario/:path*', '/InicioPropietario/:path*', '/InicioAdmin/:path*', '/InicioBaneado/:path*'],
+  matcher: ['/VistaGeneral/InicioUsuario/:path*', '/VistaGeneral/InicioPropietario/:path*', '/VistaGeneral/InicioAdmin/:path*', '/InicioBaneado/:path*'],
 };
