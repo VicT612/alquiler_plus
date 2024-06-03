@@ -1,8 +1,8 @@
 'use client'
 import React, { useState, useEffect, ChangeEvent, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import { Cuarto } from '../../types';
 import CardCuarto from './components/cardCuartos';
+import AboutRoom from './PaginaCuartos/page';
 import './cuartosView.css';
 
 const CuartosView = () => {
@@ -11,7 +11,7 @@ const CuartosView = () => {
   const [searchCriteria, setSearchCriteria] = useState<string[]>(['descripcion']);
   const [estado, setEstado] = useState('');
   const [showCriteria, setShowCriteria] = useState(false);
-  const router = useRouter();
+  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const fetchCuartos = async () => {
@@ -33,6 +33,10 @@ const CuartosView = () => {
     fetchCuartos();
   }, []);
 
+  useEffect(() => {
+    handleSearch(searchQuery, searchCriteria, estado);
+  }, [searchCriteria, estado]);
+
   const handleSearch = async (query: string, criteria: string[], estado: string) => {
     if (query.trim() === '' && estado === '') {
       fetchCuartos();
@@ -43,7 +47,7 @@ const CuartosView = () => {
           params.append('q', query);
         }
         if (estado !== '') {
-          params.append('q', estado);
+          params.append('estado', estado);
         }
         criteria.forEach(criterion => params.append('criteria', criterion));
 
@@ -77,17 +81,15 @@ const CuartosView = () => {
   const handleCriteriaChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const options = Array.from(e.target.selectedOptions, option => option.value);
     setSearchCriteria(options);
-    handleSearch(searchQuery, options, estado);
   };
 
   const handleEstadoChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setEstado(value);
-    handleSearch(searchQuery, searchCriteria, value);
   };
 
   const handleCardClick = (id: number) => {
-    router.push(`/AboutRoom/${id}`);
+    setSelectedRoomId(id);
   };
 
   const toggleShowCriteria = () => {
@@ -96,46 +98,53 @@ const CuartosView = () => {
 
   return (
     <div className="cuartos-view">
-      <h2 className="cuartos-title">Cuartos en Alquiler</h2>
-      <div className="search-container">
-        <button className="search-button" onClick={toggleShowCriteria}>Buscar</button>
-        {showCriteria && (
-          <div className={`search-options-wrapper ${showCriteria ? 'show' : ''}`}>
-            <div className="search-options">
-              <select multiple className="search-criteria" value={searchCriteria} onChange={handleCriteriaChange}>
-                <option value="precio">Precio</option>
-                <option value="direccion">Dirección</option>
-                <option value="estadoCuarto">Estado</option>
-                <option value="nombrePropietario">Nombre del Propietario</option>
-              </select>
-              {searchCriteria.includes('estadoCuarto') && (
-                <select className="estado-select" value={estado} onChange={handleEstadoChange}>
-                  <option value="">Selecciona un estado</option>
-                  <option value="DESOCUPADO">Desocupado</option>
-                  <option value="EN_CONTRATO">En contrato</option>
-                  <option value="ALQUILADO">Alquilado</option>
-                </select>
-              )}
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Buscar cuartos..."
-                value={searchQuery}
-                onChange={handleInputChange}
-              />
-            </div>
+      {selectedRoomId ? (
+        <AboutRoom roomId={selectedRoomId} onBack={() => setSelectedRoomId(null)} />
+      ) : (
+        <>
+          <h2 className="cuartos-title">Cuartos en Alquiler</h2>
+          <div className="search-container">
+            <button className="search-button" onClick={toggleShowCriteria}>Buscar</button>
+            {showCriteria && (
+              <div className={`search-options-wrapper ${showCriteria ? 'show' : ''}`}>
+                <div className="search-options">
+                  <select className="search-criteria" value={searchCriteria} onChange={handleCriteriaChange}>
+                    <option value="">Selecciona un estado</option>
+                    <option value="precio">Precio</option>
+                    <option value="direccion">Dirección</option>
+                    <option value="estadoCuarto">Estado</option>
+                    <option value="nombrePropietario">Nombre del Propietario</option>
+                  </select>
+                  {searchCriteria.includes('estadoCuarto') && (
+                    <select className="estado-select" value={estado} onChange={handleEstadoChange}>
+                      <option value="">Selecciona un estado</option>
+                      <option value="DESOCUPADO">Desocupado</option>
+                      <option value="EN_CONTRATO">En contrato</option>
+                      <option value="ALQUILADO">Alquilado</option>
+                    </select>
+                  )}
+                  <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Buscar cuartos..."
+                    value={searchQuery}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      <div className="cuartos-grid">
-        {cuartos.length > 0 ? (
-          cuartos.map((cuarto) => (
-            <CardCuarto key={cuarto.id} cuarto={cuarto} onClick={() => handleCardClick(cuarto.id)} />
-          ))
-        ) : (
-          <p>No se encontraron cuartos disponibles.</p>
-        )}
-      </div>
+          <div className="cuartos-grid">
+            {cuartos.length > 0 ? (
+              cuartos.map((cuarto) => (
+                <CardCuarto key={cuarto.id} cuarto={cuarto} onClick={() => handleCardClick(cuarto.id)} />
+              ))
+            ) : (
+              <p>No se encontraron cuartos disponibles.</p>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };

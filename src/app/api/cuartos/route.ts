@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const {         
+    const { 
       direccion,
       fotoUrlcuarto,    
       descripcion,      
@@ -40,12 +40,11 @@ export async function POST(request: Request) {
         tipoCuarto,      
         estadoCuarto,
         propietarioId: usuario.id,
-        ubicacionId    // Asegúrate de que este valor es proporcionado correctamente
+        ubicacionId
       },
     });
 
     return NextResponse.json(nuevoCuarto);
-
   } catch (error) {
     console.error('Error al crear el cuarto:', error);
     return NextResponse.json({ message: 'Error al crear el cuarto' }, { status: 500 });

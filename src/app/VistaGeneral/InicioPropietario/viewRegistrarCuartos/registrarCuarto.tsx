@@ -2,7 +2,6 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import axios from 'axios';
-import { useSession } from 'next-auth/react';
 import MapaModalCuarto from "../../../(site)/componentes/MapaModalCuarto";
 import { Cuarto } from '../../types';
 import { toast, Toaster } from 'react-hot-toast';
@@ -20,7 +19,6 @@ const steps = [
 const RegistrarCuarto = () => {
   const [cuartos, setCuartos] = useState<Cuarto[]>([]);
   const router = useRouter();
-  const { data: session } = useSession();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
     precio: '',
@@ -36,10 +34,13 @@ const RegistrarCuarto = () => {
   const [showMapModal, setShowMapModal] = useState(false);
 
   useEffect(() => {
-    if (session?.user?.email) {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const userEmail = user.email || '';
+
+    if (userEmail) {
       setFormData((prevFormData) => ({
         ...prevFormData,
-        email: session.user?.email ?? ''
+        email: userEmail
       }));
     }
 
@@ -49,7 +50,7 @@ const RegistrarCuarto = () => {
     } else {
       document.documentElement.classList.remove('dark');
     }
-  }, [session]);
+  }, []);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
