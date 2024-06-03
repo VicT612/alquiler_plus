@@ -57,8 +57,12 @@ function AboutRoom({ roomId, onBack }: AboutRoomProps) {
 
   const sendComment = async (email: string): Promise<void> => {
     try {
+      if (!email) {
+        throw new Error("Email no proporcionado");
+      }
+
       const response = await axios.post("/api/agregar-comentario", {
-        email: email,
+        email,
         contenido: commentContent,
         calificacion: rating,
         cuartoId: selectedRoom.id
@@ -78,10 +82,11 @@ function AboutRoom({ roomId, onBack }: AboutRoomProps) {
     if (!session) {
       toggleModal();
     } else {
-      sendComment(session.data?.user?.email as string);
+      const userEmail = session.data?.user?.email as string;
+      sendComment(userEmail);
     }
   };
-
+  
   const fetchComments = async (cuartoId: string): Promise<void> => {
     try {
       const response = await axios.post("/api/getComentario", { cuartoId });

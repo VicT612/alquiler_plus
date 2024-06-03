@@ -108,8 +108,7 @@ const CuartosView = () => {
             {showCriteria && (
               <div className={`search-options-wrapper ${showCriteria ? 'show' : ''}`}>
                 <div className="search-options">
-                  <select className="search-criteria" value={searchCriteria} onChange={handleCriteriaChange}>
-                    <option value="">Selecciona un estado</option>
+                  <select multiple className="search-criteria" value={searchCriteria} onChange={handleCriteriaChange}>
                     <option value="precio">Precio</option>
                     <option value="direccion">Dirección</option>
                     <option value="estadoCuarto">Estado</option>
