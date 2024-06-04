@@ -105,52 +105,50 @@ const AboutRoom: React.FC<AboutRoomProps> = ({ onBack }) => {
     <div className={`container ${darkMode ? 'dark' : 'light'}`}>
       <button className="button" onClick={onBack}>Volver</button>
       <h1 className="title">Detalles del Cuarto</h1>
-      <div className="grid-container">
-        <div className="image-container">
-          <img className="image" src={selectedRoom.fotoUrlcuarto} alt="Foto del cuarto" />
-        </div>
-        <div className="details-comments-container">
-          <div className="details-container">
-            <div className="details-card">
-              <p className="bold">Dirección: {selectedRoom.direccion}</p>
-              <p className="mb-2">Precio: {selectedRoom.precio}</p>
-              <p className="mb-2">Descripción: {selectedRoom.descripcion}</p>
-              <p className="mb-2">Condiciones: {selectedRoom.condiciones}</p>
-              <p className="mb-2">Tipo: {selectedRoom.tipoCuarto}</p>
-              <p className="mb-2">Estado: {selectedRoom.estadoCuarto}</p>
-              <p className="mb-2">Propietario: {selectedRoom.propietario.nombre}</p>
-            </div>
-            <button className="button" onClick={() => console.log("Chatea con el arrendador")}>
-              Chatea con el arrendador
-            </button>
+      <div className="image-container">
+        <img className="image" src={selectedRoom.fotoUrlcuarto} alt="Foto del cuarto" />
+      </div>
+      <div className="details-comments-container">
+        <div className="details-container">
+          <div className="details-card">
+            <p className="bold">Dirección: {selectedRoom.direccion}</p>
+            <p className="mb-2">Precio: {selectedRoom.precio}</p>
+            <p className="mb-2">Descripción: {selectedRoom.descripcion}</p>
+            <p className="mb-2">Condiciones: {selectedRoom.condiciones}</p>
+            <p className="mb-2">Tipo: {selectedRoom.tipoCuarto}</p>
+            <p className="mb-2">Estado: {selectedRoom.estadoCuarto}</p>
+            <p className="mb-2">Propietario: {selectedRoom.propietario.nombre}</p>
           </div>
-          <div className="comments-rating">
-            <form onSubmit={handleFormSubmit} className="form">
-              <div className="form-group">
-                <input
-                  type="text"
-                  value={commentContent}
-                  onChange={handleCommentChange}
-                  placeholder="Escribe tu comentario aquí..."
-                  className="input"
-                />
-                <Rating rating={rating} onChange={handleRatingChange} />
-              </div>
-              <button type="submit" className="button">
-                Enviar Comentario
-              </button>
-            </form>
-            <div className="comments-section">
-              <h2 className="comments-title">Comentarios</h2>
-              <div className="comments-list">
-                <ul>
-                  {comments.map((comment) => (
-                    <li key={comment.id} className="comment-item">
-                      <CommentCard comentario={comment} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
+          <button className="button" onClick={() => console.log("Chatea con el arrendador")}>
+            Chatea con el arrendador
+          </button>
+        </div>
+        <div className="comments-rating">
+          <form onSubmit={handleFormSubmit} className="form">
+            <div className="form-group">
+              <input
+                type="text"
+                value={commentContent}
+                onChange={handleCommentChange}
+                placeholder="Escribe tu comentario aquí..."
+                className="input"
+              />
+              <Rating rating={rating} onChange={handleRatingChange} />
+            </div>
+            <button type="submit" className="button">
+              Enviar Comentario
+            </button>
+          </form>
+          <div className="comments-section">
+            <h2 className="comments-title">Comentarios</h2>
+            <div className="comments-list">
+              <ul>
+                {comments.map((comment) => (
+                  <li key={comment.id} className="comment-item">
+                    <CommentCard comentario={comment} />
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>

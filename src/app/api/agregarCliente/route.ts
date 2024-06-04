@@ -12,8 +12,8 @@ export async function POST(request: Request) {
     // Validation schema
     const schema = Yup.object().shape({
       email: Yup.string().email().required(),
-      nombre: Yup.string().required(),
-      apellido: Yup.string().required(),
+      nombre: Yup.string().matches(/^[a-zA-ZÀ-ÿ\s]+$/, 'Nombre solo debe contener letras').required(),
+      apellido: Yup.string().matches(/^[a-zA-ZÀ-ÿ\s]+$/, 'Apellido solo debe contener letras').required(),
       contrasena: Yup.string().min(8).required(),
     });
 

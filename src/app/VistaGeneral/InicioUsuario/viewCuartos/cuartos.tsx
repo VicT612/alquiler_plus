@@ -10,7 +10,7 @@ const CuartosView = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchCriteria, setSearchCriteria] = useState<string[]>(['descripcion']);
   const [estado, setEstado] = useState('');
-  const [showCriteria, setShowCriteria] = useState(false);
+  const [activeAccordion, setActiveAccordion] = useState<string | null>(null);
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -93,14 +93,14 @@ const CuartosView = () => {
     localStorage.setItem('cuartoId', id.toString()); // Guardar el ID del cuarto seleccionado en el localStorage
   };
 
-  const toggleShowCriteria = () => {
-    setShowCriteria(!showCriteria);
+  const toggleAccordion = (id: string) => {
+    setActiveAccordion(activeAccordion === id ? null : id);
   };
 
   return (
     <div className="cuartos-view">
       {selectedRoomId ? (
-        <AboutRoom  onBack={() => { 
+        <AboutRoom onBack={() => { 
           setSelectedRoomId(null); 
           localStorage.removeItem('selectedRoomId'); // Limpiar el ID del cuarto seleccionado del localStorage
         }} />
@@ -108,44 +108,44 @@ const CuartosView = () => {
         <>
           <h2 className="cuartos-title">Cuartos en Alquiler</h2>
           <div className="search-container">
-            <button className="search-button" onClick={toggleShowCriteria}>Buscar</button>
-            {showCriteria && (
-              <div className={`search-options-wrapper ${showCriteria ? 'show' : ''}`}>
+            <button className="search-button" onClick={() => toggleAccordion('filtroBusqueda')}>Buscar</button>
+            {activeAccordion === 'filtroBusqueda' && (
+              <div className={`search-options-wrapper ${activeAccordion === 'filtroBusqueda' ? 'show' : ''}`}>
                 <div className="search-options">
-                  <select multiple className="search-criteria" value={searchCriteria} onChange={handleCriteriaChange}>
-                    <option value="">Selecciona un filtro de busqueda</option>
-                    <option value="precio">Precio</option>
-                    <option value="direccion">Dirección</option>
-                    <option value="estadoCuarto">Estado</option>
-                    <option value="nombrePropietario">Nombre del Propietario</option>
-                  </select>
-                  {searchCriteria.includes('estadoCuarto') && (
-                    <select className="estado-select" value={estado} onChange={handleEstadoChange}>
-                      <option value="">Selecciona un estado</option>
-                      <option value="DESOCUPADO">Desocupado</option>
-                      <option value="EN_CONTRATO">En contrato</option>
-                      <option value="ALQUILADO">Alquilado</option>
-                    </select>
-                  )}
-                  <input
-                    type="text"
-                    className="search-input"
-                    placeholder="Buscar cuartos..."
-                    value={searchQuery}
-                    onChange={handleInputChange}
-                  />
+                  <div className="accordion">
+                    <div className="accordion-item">
+                      <button className="accordion-header" onClick={() => toggleAccordion('filtroBusqueda')}>
+                        Selecciona un filtro de búsqueda
+                      </button>
+                      <div className={`accordion-content ${activeAccordion === 'filtroBusqueda' ? 'show' : ''}`}>
+                        <input 
+                          type="text" 
+                          value={searchQuery} 
+                          onChange={handleInputChange} 
+                          placeholder="Buscar..." 
+                          className="search-input"
+                        />
+                        <select multiple value={searchCriteria} onChange={handleCriteriaChange}>
+                          <option value="descripcion">Descripción</option>
+                          <option value="direccion">Dirección</option>
+                          <option value="caracteristicas">Características</option>
+                        </select>
+                        <select value={estado} onChange={handleEstadoChange}>
+                          <option value="">Todos</option>
+                          <option value="disponible">Disponible</option>
+                          <option value="ocupado">Ocupado</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
           </div>
-          <div className="cuartos-grid">
-            {cuartos.length > 0 ? (
-              cuartos.map((cuarto) => (
-                <CardCuarto key={cuarto.id} cuarto={cuarto} onClick={() => handleCardClick(cuarto.id)} />
-              ))
-            ) : (
-              <p>No se encontraron cuartos disponibles.</p>
-            )}
+          <div className="card-list">
+            {cuartos.map((cuarto) => (
+              <CardCuarto key={cuarto.id} cuarto={cuarto} onClick={handleCardClick} />
+            ))}
           </div>
         </>
       )}
