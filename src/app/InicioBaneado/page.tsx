@@ -1,8 +1,12 @@
-'use client'
+'use client';
 import React from 'react';
-import './page.css'; // Importando el archivo CSS
+import './page.css';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const BaneadoPage = () => {
+  const router = useRouter();
+
   return (
     <div className="container">
       <div className="card">
@@ -16,11 +20,17 @@ const BaneadoPage = () => {
         </div>
         <div className="advice">
           <strong className="advice-bold">Consejo:</strong>
-          <span className="advice-text"> Revisa nuestras <a href="/guidelines" className="advice-link">normas comunitarias</a> para evitar futuros problemas.</span>
+          <span className="advice-text"> Revisa nuestras 
+            <Link href="/Normas">
+              <a className="advice-link">normas comunitarias</a>
+            </Link> para evitar futuros problemas.
+          </span>
         </div>
-        <a href="/contact-support" className="support-link">
-          Contacta con el soporte
-        </a>
+        <Link href="/contact-support">
+          <a className="support-link">
+            Contacta con el soporte
+          </a>
+        </Link>
       </div>
     </div>
   );

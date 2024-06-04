@@ -5,7 +5,7 @@ import './page.css';
 
 const OwnerDashboard = () => {
   const [selectedView, setSelectedView] = useState('cuartos');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
  
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
