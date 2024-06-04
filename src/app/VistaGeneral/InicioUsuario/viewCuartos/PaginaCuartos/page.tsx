@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import CommentCard from "./cardComentarios";
@@ -96,7 +96,6 @@ const AboutRoom: React.FC<AboutRoomProps> = ({ onBack }) => {
       console.error("Error al obtener comentarios:", error);
     }
   };
-  
 
   if (!selectedRoom) {
     return <div>Loading...</div>;
