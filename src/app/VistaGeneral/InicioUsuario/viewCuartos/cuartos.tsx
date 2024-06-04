@@ -104,52 +104,49 @@ const CuartosView = () => {
 
   return (
     <div className="cuartos-view">
-      {selectedRoomId ? (
-        <AboutRoom onBack={handleBack} /> 
-      ) : (
-          <div className="search-container">
-            <h2 className="cuartos-title">Cuartos en Alquiler</h2>
-            <button className="search-button" onClick={() => toggleAccordion('filtroBusqueda')}>Buscar</button>
-            {activeAccordion === 'filtroBusqueda' && (
-              <div className={`search-options-wrapper ${activeAccordion === 'filtroBusqueda' ? 'show' : ''}`}>
-                <div className="search-options">
-                  <div className="accordion">
-                    <div className="accordion-item">
-                      <button className="accordion-header" onClick={() => toggleAccordion('filtroBusqueda')}>
-                        Selecciona un filtro de búsqueda
-                      </button>
-                      <div className={`accordion-content ${activeAccordion === 'filtroBusqueda' ? 'show' : ''}`}>
-                        <input 
-                          type="text" 
-                          value={searchQuery} 
-                          onChange={handleInputChange} 
-                          placeholder="Buscar..." 
-                          className="search-input"
-                        />
-                        <select multiple value={searchCriteria} onChange={handleCriteriaChange}>
-                          <option value="descripcion">Descripción</option>
-                          <option value="direccion">Dirección</option>
-                          <option value="caracteristicas">Características</option>
-                        </select>
-                        <select value={estado} onChange={handleEstadoChange}>
-                          <option value="">Todos</option>
-                          <option value="disponible">Disponible</option>
-                          <option value="ocupado">Ocupado</option>
-                        </select>
-                      </div>
-                    </div>
+      <div className="search-container">
+        <h2 className="cuartos-title">Cuartos en Alquiler</h2>
+        <button className="search-button" onClick={() => toggleAccordion('filtroBusqueda')}>Buscar</button>
+        {activeAccordion === 'filtroBusqueda' && (
+          <div className={`search-options-wrapper ${activeAccordion === 'filtroBusqueda' ? 'show' : ''}`}>
+            <div className="search-options">
+              <div className="accordion">
+                <div className="accordion-item">
+                  <button className="accordion-header" onClick={() => toggleAccordion('filtroBusqueda')}>
+                    Selecciona un filtro de búsqueda
+                  </button>
+                  <div className={`accordion-content ${activeAccordion === 'filtroBusqueda' ? 'show' : ''}`}>
+                    <input 
+                      type="text" 
+                      value={searchQuery} 
+                      onChange={handleInputChange} 
+                      placeholder="Buscar..." 
+                      className="search-input"
+                    />
+                    <select multiple value={searchCriteria} onChange={handleCriteriaChange}>
+                      <option value="descripcion">Descripción</option>
+                      <option value="direccion">Dirección</option>
+                      <option value="caracteristicas">Características</option>
+                    </select>
+                    <select value={estado} onChange={handleEstadoChange}>
+                      <option value="">Todos</option>
+                      <option value="disponible">Disponible</option>
+                      <option value="ocupado">Ocupado</option>
+                    </select>
                   </div>
                 </div>
               </div>
-            )}
+            </div>
           </div>
-      )}
+        )}
+      </div>
       <div className="card-list">
-            {cuartos.map((cuarto) => (
-              <CardCuarto key={cuarto.id} cuarto={cuarto} onClick={handleCardClick} />
-            ))}
+        {cuartos.map((cuarto) => (
+          <CardCuarto key={cuarto.id} cuarto={cuarto} onClick={handleCardClick} />
+        ))}
       </div>
     </div>
+
   );
 };
 

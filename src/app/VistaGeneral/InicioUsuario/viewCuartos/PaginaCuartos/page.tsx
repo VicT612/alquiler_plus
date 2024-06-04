@@ -1,5 +1,5 @@
 // AboutRoom.jsx
-
+'use client'
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import CommentCard from "./cardComentarios";
