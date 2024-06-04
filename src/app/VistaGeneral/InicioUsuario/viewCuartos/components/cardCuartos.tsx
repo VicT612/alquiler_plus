@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { Cuarto } from '../../../types';
 import './cardCuarto.css';

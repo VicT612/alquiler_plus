@@ -3,10 +3,12 @@
 /* Estilo general para la vista de cuartos */
 .cuartos-view {
   padding: 16px;
-  margin-left: 100px;
+  margin-left: 100px; /* Margen de 100px a la izquierda */
+  margin-right: 20px; /* Margen pequeño a la derecha */
   background-color: #f9fafb; /* Fondo claro */
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  min-height: calc(100vh - 80px); /* Ajustar el tamaño del componente */
 }
 
 /* Título de la sección de cuartos */
@@ -37,6 +39,7 @@
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-left: 10px; /* Aumentar el espacio entre el título y el botón */
 }
 
 .search-button:hover {
@@ -64,7 +67,7 @@
 }
 
 .search-input {
-  width: 100%;
+  width: calc(100% - 40px); /* Ajustar el tamaño del input */
   padding: 8px;
   margin-bottom: 16px;
   border: 1px solid #d1d5db;
@@ -141,3 +144,4 @@
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Ajusta para llenar el espacio con un mínimo de 300px por tarjeta */
   }
 }
+

@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect, ChangeEvent, useRef } from 'react';
 import { Cuarto } from '../../types';
 import CardCuarto from './components/cardCuartos';
@@ -89,21 +90,25 @@ const CuartosView = () => {
 
   const handleCardClick = (id: number) => {
     setSelectedRoomId(id);
-    localStorage.setItem('cuartoId', id.toString()); // Guardar el ID del cuarto seleccionado en el localStorage
+    localStorage.setItem('cuartoId', id.toString());
   };
 
   const toggleAccordion = (id: string) => {
     setActiveAccordion(activeAccordion === id ? null : id);
   };
 
+  const handleBack = () => {
+    setSelectedRoomId(null); // Limpiar selectedRoomId para volver a la vista de cuartos
+    localStorage.removeItem('cuartoId'); // Limpiar el ID del cuarto seleccionado del localStorage
+  };
+
   return (
     <div className="cuartos-view">
       {selectedRoomId ? (
-        <AboutRoom />
+        <AboutRoom onBack={handleBack} /> 
       ) : (
-        <>
-          <h2 className="cuartos-title">Cuartos en Alquiler</h2>
           <div className="search-container">
+            <h2 className="cuartos-title">Cuartos en Alquiler</h2>
             <button className="search-button" onClick={() => toggleAccordion('filtroBusqueda')}>Buscar</button>
             {activeAccordion === 'filtroBusqueda' && (
               <div className={`search-options-wrapper ${activeAccordion === 'filtroBusqueda' ? 'show' : ''}`}>
@@ -138,13 +143,12 @@ const CuartosView = () => {
               </div>
             )}
           </div>
-          <div className="card-list">
+      )}
+      <div className="card-list">
             {cuartos.map((cuarto) => (
               <CardCuarto key={cuarto.id} cuarto={cuarto} onClick={handleCardClick} />
             ))}
-          </div>
-        </>
-      )}
+      </div>
     </div>
   );
 };

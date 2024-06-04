@@ -1,3 +1,5 @@
+// AboutRoom.jsx
+
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import CommentCard from "./cardComentarios";
@@ -11,8 +13,11 @@ interface Comment {
   fechaRegistro: Date;
 }
 
-const AboutRoom: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+interface AboutRoomProps {
+  onBack: () => void; // Función para manejar la acción de volver
+}
+
+const AboutRoom: React.FC<AboutRoomProps> = ({ onBack }) => {
   const [commentContent, setCommentContent] = useState<string>("");
   const [rating, setRating] = useState<number>(0);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -94,7 +99,7 @@ const AboutRoom: React.FC = () => {
 
   return (
     <div className={`container ${darkMode ? 'dark' : 'light'}`}>
-      <button className="button" onClick={() => setSelectedRoom(null)}>Volver</button>
+      <button className="button" onClick={onBack}>Volver</button>
       <h1 className="title">Detalles del Cuarto</h1>
       <div className="image-container">
         <img className="image" src={selectedRoom.fotoUrlcuarto} alt="Foto del cuarto" />
@@ -167,3 +172,4 @@ const Rating: React.FC<{ rating: number; onChange: (newRating: number) => void }
 };
 
 export default AboutRoom;
+
