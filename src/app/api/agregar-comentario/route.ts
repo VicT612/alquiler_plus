@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { db } from "@/lib/db"; // Asegúrate de que la importación esté correcta
 
 export async function POST(request: Request) {
   try {
@@ -12,13 +12,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Usuario no encontrado' }, { status: 404 });
     }
 
-    // Crear el comentario asociado al usuario y al cuarto
+    // Verificar si el propietario existe
+    const existingPropietario = await db.cuarto.findUnique({ where: { id: cuartoId } });
+    if (!existingPropietario) {
+      return NextResponse.json({ message: 'Propietario no encontrado' }, { status: 404 });
+    }
+
+    // Crear el comentario asociado al usuario, propietario y cuarto
     const nuevoComentario = await db.comentario.create({
       data: {
         contenido,
-        usuarioId: existingUser.id, 
+        usuarioId: existingUser.id,
+        propietarioId: existingPropietario.propietarioId,
         cuartoId,
-        estrellas 
+        estrellas
       },
     });
 
@@ -28,4 +35,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Error al agregar el comentario' }, { status: 500 });
   }
 }
-

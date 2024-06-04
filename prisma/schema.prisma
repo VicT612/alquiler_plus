@@ -23,9 +23,8 @@ model usuario {
   rol                      UserRole       @default(USUARIO)
   tutorialCompletado       Boolean        @default(false)
   ubicacionId              Int?
-  calificacionesRecibidas  calificacion[] @relation("CalificacionesRecibidas")
-  calificacionesRealizadas calificacion[] @relation("CalificacionesRealizadas")
-  comentarios              comentario[]
+  comentariosRealizados    comentario[] @relation("ComentariosRealizados")
+  comentariosRecibidos     comentario[] @relation("ComentariosRecibidos")
   cuartosPropios           cuarto[]       @relation("PropietarioCuartos")
   deudas                   deuda[]
   mensajesEnviados         mensaje[]      @relation("MensajesEnviados")
@@ -62,8 +61,10 @@ model comentario {
   estrellas     Int
   cuartoId      Int
   usuarioId     Int
+  propietarioId Int
   cuarto        cuarto   @relation("CuartoComentarios", fields: [cuartoId], references: [id])
-  usuario       usuario  @relation(fields: [usuarioId], references: [id])
+  usuario       usuario  @relation("ComentariosRealizados", fields: [usuarioId], references: [id])
+  propietario   usuario  @relation("ComentariosRecibidos", fields: [propietarioId], references: [id])
 }
 
 model ubicacion {
@@ -117,16 +118,6 @@ model deuda {
   fechaVencimiento DateTime
   descripcion      String
   usuario          usuario  @relation(fields: [usuarioId], references: [id])
-}
-
-model calificacion {
-  id            Int     @id @default(autoincrement())
-  calificadorId Int
-  calificadoId  Int
-  estrellas     Int
-  comentario    String
-  calificado    usuario @relation("CalificacionesRecibidas", fields: [calificadoId], references: [id])
-  calificador   usuario @relation("CalificacionesRealizadas", fields: [calificadorId], references: [id])
 }
 
 model oferta {

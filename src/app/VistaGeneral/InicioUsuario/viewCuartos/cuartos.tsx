@@ -90,6 +90,7 @@ const CuartosView = () => {
 
   const handleCardClick = (id: number) => {
     setSelectedRoomId(id);
+    localStorage.setItem('cuartoId', id.toString()); // Guardar el ID del cuarto seleccionado en el localStorage
   };
 
   const toggleShowCriteria = () => {
@@ -99,7 +100,10 @@ const CuartosView = () => {
   return (
     <div className="cuartos-view">
       {selectedRoomId ? (
-        <AboutRoom roomId={selectedRoomId} onBack={() => setSelectedRoomId(null)} />
+        <AboutRoom  onBack={() => { 
+          setSelectedRoomId(null); 
+          localStorage.removeItem('selectedRoomId'); // Limpiar el ID del cuarto seleccionado del localStorage
+        }} />
       ) : (
         <>
           <h2 className="cuartos-title">Cuartos en Alquiler</h2>
@@ -109,6 +113,7 @@ const CuartosView = () => {
               <div className={`search-options-wrapper ${showCriteria ? 'show' : ''}`}>
                 <div className="search-options">
                   <select multiple className="search-criteria" value={searchCriteria} onChange={handleCriteriaChange}>
+                    <option value="">Selecciona un filtro de busqueda</option>
                     <option value="precio">Precio</option>
                     <option value="direccion">Dirección</option>
                     <option value="estadoCuarto">Estado</option>
