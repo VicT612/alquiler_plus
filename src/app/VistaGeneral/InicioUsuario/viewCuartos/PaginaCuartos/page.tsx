@@ -16,7 +16,7 @@ interface AboutRoomProps {
   onBack: () => void;
 }
 
-function AboutRoom({ onBack }: AboutRoomProps) {
+const AboutRoom: React.FC<AboutRoomProps> = ({ onBack }) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [commentContent, setCommentContent] = useState<string>("");
   const [rating, setRating] = useState<number>(0);
@@ -104,23 +104,26 @@ function AboutRoom({ onBack }: AboutRoomProps) {
 
   return (
     <div className={`container ${darkMode ? 'dark' : 'light'}`}>
-      <button className="" onClick={onBack}>Volver</button>
-      <h1 className="">Detalles del Cuarto</h1>
-      <div className="">
-        <div className="">
-          <img className="i" src={selectedRoom.fotoUrlcuarto} alt="Foto del cuarto" />
+      <button className="button" onClick={onBack}>Volver</button>
+      <h1 className="title">Detalles del Cuarto</h1>
+      <div className="grid-container">
+        <div className="image-container">
+          <img className="image" src={selectedRoom.fotoUrlcuarto} alt="Foto del cuarto" />
         </div>
-        <div className="">
-          <div className="">
-            <div className="">
-              <p className="">Dirección: {selectedRoom.direccion}</p>
-              <p className="">Precio: {selectedRoom.precio}</p>
-              <p className="">Descripción: {selectedRoom.descripcion}</p>
-              <p className="">Condiciones: {selectedRoom.condiciones}</p>
-              <p className="">Tipo: {selectedRoom.tipoCuarto}</p>
-              <p className="">Estado: {selectedRoom.estadoCuarto}</p>
-              <p className="">Propietario: {selectedRoom.propietario.nombre}</p>
+        <div className="details-comments-container">
+          <div className="details-container">
+            <div className="details-card">
+              <p className="bold">Dirección: {selectedRoom.direccion}</p>
+              <p className="mb-2">Precio: {selectedRoom.precio}</p>
+              <p className="mb-2">Descripción: {selectedRoom.descripcion}</p>
+              <p className="mb-2">Condiciones: {selectedRoom.condiciones}</p>
+              <p className="mb-2">Tipo: {selectedRoom.tipoCuarto}</p>
+              <p className="mb-2">Estado: {selectedRoom.estadoCuarto}</p>
+              <p className="mb-2">Propietario: {selectedRoom.propietario.nombre}</p>
             </div>
+            <button className="button" onClick={() => console.log("Chatea con el arrendador")}>
+              Chatea con el arrendador
+            </button>
           </div>
           <div className="comments-rating">
             <form onSubmit={handleFormSubmit} className="form">
@@ -155,9 +158,9 @@ function AboutRoom({ onBack }: AboutRoomProps) {
       </div>
     </div>
   );
-}
+};
 
-function Rating({ rating, onChange }: { rating: number; onChange: (newRating: number) => void }) {
+const Rating: React.FC<{ rating: number; onChange: (newRating: number) => void }> = ({ rating, onChange }) => {
   const stars = [1, 2, 3, 4, 5];
 
   return (
@@ -173,6 +176,6 @@ function Rating({ rating, onChange }: { rating: number; onChange: (newRating: nu
       ))}
     </div>
   );
-}
+};
 
 export default AboutRoom;
