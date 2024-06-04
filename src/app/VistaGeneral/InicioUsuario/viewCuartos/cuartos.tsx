@@ -1,4 +1,3 @@
-'use client'
 import React, { useState, useEffect, ChangeEvent, useRef } from 'react';
 import { Cuarto } from '../../types';
 import CardCuarto from './components/cardCuartos';
@@ -100,10 +99,7 @@ const CuartosView = () => {
   return (
     <div className="cuartos-view">
       {selectedRoomId ? (
-        <AboutRoom onBack={() => { 
-          setSelectedRoomId(null); 
-          localStorage.removeItem('selectedRoomId'); // Limpiar el ID del cuarto seleccionado del localStorage
-        }} />
+        <AboutRoom />
       ) : (
         <>
           <h2 className="cuartos-title">Cuartos en Alquiler</h2>

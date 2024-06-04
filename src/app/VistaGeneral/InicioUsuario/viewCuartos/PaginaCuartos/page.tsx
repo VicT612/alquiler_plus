@@ -1,4 +1,3 @@
-'use client';
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import CommentCard from "./cardComentarios";
@@ -12,11 +11,7 @@ interface Comment {
   fechaRegistro: Date;
 }
 
-interface AboutRoomProps {
-  onBack: () => void;
-}
-
-const AboutRoom: React.FC<AboutRoomProps> = ({ onBack }) => {
+const AboutRoom: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [commentContent, setCommentContent] = useState<string>("");
   const [rating, setRating] = useState<number>(0);
@@ -39,10 +34,6 @@ const AboutRoom: React.FC<AboutRoomProps> = ({ onBack }) => {
     } catch (error) {
       console.error("Error al obtener datos del cuarto:", error);
     }
-  };
-
-  const toggleModal = (): void => {
-    setIsModalOpen(!isModalOpen);
   };
 
   const handleCommentChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -103,7 +94,7 @@ const AboutRoom: React.FC<AboutRoomProps> = ({ onBack }) => {
 
   return (
     <div className={`container ${darkMode ? 'dark' : 'light'}`}>
-      <button className="button" onClick={onBack}>Volver</button>
+      <button className="button" onClick={() => setSelectedRoom(null)}>Volver</button>
       <h1 className="title">Detalles del Cuarto</h1>
       <div className="image-container">
         <img className="image" src={selectedRoom.fotoUrlcuarto} alt="Foto del cuarto" />

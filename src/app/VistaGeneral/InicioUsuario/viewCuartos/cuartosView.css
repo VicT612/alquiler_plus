@@ -3,8 +3,7 @@
 /* Estilo general para la vista de cuartos */
 .cuartos-view {
   padding: 16px;
-  max-width: 1200px;
-  margin-left: 30px;
+  margin-left: 100px;
   background-color: #f9fafb; /* Fondo claro */
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
@@ -115,40 +114,30 @@
   border-radius: 4px;
 }
 
-/* Lista de tarjetas */
+/* Estilo para la lista de tarjetas ajustando dinámicamente */
 .card-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
+  gap: 80px; /* Puedes ajustar el espacio según sea necesario */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Empieza con un mínimo de 280px por tarjeta */
 }
 
 /* Media query para dispositivos más pequeños */
 @media (max-width: 768px) {
-  .search-button {
-    font-size: 0.9rem;
-    padding: 8px 16px;
+  .card-list {
+    grid-template-columns: 1fr; /* Todos los items en una única columna en pantallas pequeñas */
   }
+}
 
-  .search-options-wrapper {
-    max-width: 100%;
-  }
-
-  .search-input,
-  .accordion-content select,
-  .accordion-content input {
-    font-size: 0.9rem;
-    padding: 6px;
-  }
-
-  .cuartos-title {
-    font-size: 1.5rem;
-    margin-bottom: 16px;
+/* Media query para pantallas medianas */
+@media (min-width: 769px) and (max-width: 1199px) {
+  .card-list {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Auto-ajusta las tarjetas para llenar el espacio disponible */
   }
 }
 
 /* Media query para pantallas grandes */
 @media (min-width: 1200px) {
   .card-list {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Ajusta para llenar el espacio con un mínimo de 300px por tarjeta */
   }
 }
